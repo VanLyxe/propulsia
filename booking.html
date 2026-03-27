@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Planifiez un rendez-vous gratuit avec PropulsIA — Call vidéo ou rendez-vous en présentiel à Tahiti. Confirmation automatique par email.">
+  <title>Planifier un RDV — PropulsIA</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <!-- Calendly widget CSS (prêt à activer) -->
+  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="header scrolled" id="header">
+    <div class="container">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">⚡</div>
+        <span>PropulsIA</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Accueil</a>
+        <a href="demo.html">Démo</a>
+        <a href="index.html#pricing">Tarifs</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
+      <div class="nav-cta">
+        <a href="login.html" class="btn btn-secondary btn-sm">Connexion</a>
+      </div>
+      <div class="mobile-menu-btn" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-close" onclick="toggleMobileMenu()">✕</div>
+    <a href="index.html" onclick="toggleMobileMenu()">Accueil</a>
+    <a href="demo.html">Démo</a>
+    <a href="index.html#pricing">Tarifs</a>
+    <a href="login.html" class="btn btn-secondary">Connexion</a>
+  </div>
+
+  <!-- Main -->
+  <main style="padding-top:100px; min-height:100vh;">
+    <div class="container">
+      <div style="text-align:center; margin-bottom:48px;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 12px;">
+          <span style="font-size: clamp(2rem, 4vw, 3rem); line-height: 1;">📅</span>
+          <h1 class="section-title" style="margin-bottom: 0;">Planifier un Rendez-vous</h1>
+        </div>
+        <p style="color:var(--text-secondary); font-size:1.1rem; max-width:600px; margin:0 auto;">
+          Réservez un créneau gratuit pour une démo personnalisée ou un échange sur votre projet. Confirmation
+          automatique par email.
+        </p>
+      </div>
+
+      <!-- ===== Calendly Section ===== -->
+      <div class="glass-card" style="padding:32px; margin-bottom:40px; border-color: rgba(170,255,0,0.2);">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+          <div
+            style="width:40px; height:40px; background:rgba(170,255,0,0.1); border:1px solid var(--border-glow); border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
+            📆</div>
+          <div>
+            <h3 style="font-size:1.1rem;">Réservation en ligne</h3>
+            <p style="color:var(--text-muted); font-size:0.85rem;">Choisissez un créneau directement dans notre agenda
+            </p>
+          </div>
+        </div>
+
+        <!-- Calendly inline widget — Remplacer l'URL par votre lien Calendly réel -->
+        <!-- Pour activer : créez un compte sur calendly.com et remplacez l'URL ci-dessous -->
+        <div id="calendlyWidget">
+          <!-- Placeholder activé tant que l'URL Calendly n'est pas configurée -->
+          <div
+            style="background: rgba(170,255,0,0.04); border: 1px dashed rgba(170,255,0,0.25); border-radius: var(--radius-lg); padding: 48px; text-align: center;">
+            <div style="font-size:3rem; margin-bottom:16px;">📅</div>
+            <h3 style="margin-bottom:8px; font-size:1.1rem;">Calendrier Calendly</h3>
+            <p
+              style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:24px; max-width:500px; margin-left:auto; margin-right:auto;">
+              Le calendrier de réservation en ligne sera activé ici. En attendant, utilisez le formulaire ci-dessous ou
+              contactez-nous directement.
+            </p>
+            <a href="https://calendly.com" target="_blank" class="btn btn-primary btn-sm">
+              Ouvrir Calendly ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- Calendly inline widget — activer en décommentant et remplaçant YOUR_CALENDLY_URL -->
+        <!--
+        <div class="calendly-inline-widget"
+          data-url="https://calendly.com/YOUR_CALENDLY_URL/rdv-propulsia?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=AAFF00"
+          style="min-width:320px; height:700px;">
+        </div>
+        <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+        -->
+      </div>
+
+      <!-- ===== Divider ===== -->
+      <div style="display:flex; align-items:center; gap:20px; margin-bottom:40px;">
+        <div style="flex:1; height:1px; background: var(--border-color);"></div>
+        <span style="color:var(--text-muted); font-size:0.85rem;">ou remplissez le formulaire</span>
+        <div style="flex:1; height:1px; background: var(--border-color);"></div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:40px; max-width:1000px; margin:0 auto;" class="booking-grid">
+
+        <!-- Left: Calendar + Slots -->
+        <div>
+          <!-- Meeting Type -->
+          <div class="glass-card" style="padding:24px; margin-bottom:24px;">
+            <h3 style="font-size:1rem; margin-bottom:16px;">Type de rendez-vous</h3>
+            <div style="display:flex; gap:12px;">
+              <button class="meeting-type-btn btn btn-primary btn-sm" id="meetTypeCall"
+                onclick="selectMeetingType('call', this)" style="flex:1;">
+                📹 Call vidéo
+              </button>
+              <button class="meeting-type-btn btn btn-secondary btn-sm" id="meetTypeOnsite"
+                onclick="selectMeetingType('onsite', this)" style="flex:1;">
+                🏢 En présentiel
+              </button>
+            </div>
+          </div>
+
+          <!-- Calendar -->
+          <div class="calendar" id="calendar">
+            <div class="calendar-header">
+              <h3 id="calendarTitle">Avril 2026</h3>
+              <div class="calendar-nav">
+                <button onclick="changeMonth(-1)">◀</button>
+                <button onclick="changeMonth(1)">▶</button>
+              </div>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+          </div>
+
+          <!-- Time Slots -->
+          <div id="timeSlotsContainer" style="margin-top:24px; display:none;">
+            <h3 style="font-size:1rem; margin-bottom:12px;">Créneaux disponibles — <span id="selectedDateText"></span>
+            </h3>
+            <div class="time-slots" id="timeSlots"></div>
+          </div>
+        </div>
+
+        <!-- Right: Booking Form -->
+        <div>
+          <div class="glass-card" style="padding:32px;">
+            <h3 style="font-size:1.1rem; margin-bottom:24px;">📝 Vos informations</h3>
+            <form id="bookingForm" onsubmit="submitBooking(event)">
+              <div class="form-group">
+                <label for="bookName">Nom complet *</label>
+                <input type="text" id="bookName" placeholder="Votre nom" required>
+              </div>
+              <div class="form-group">
+                <label for="bookEmail">Email *</label>
+                <input type="email" id="bookEmail" placeholder="votre@email.pf" required>
+              </div>
+              <div class="form-group">
+                <label for="bookPhone">Téléphone</label>
+                <input type="tel" id="bookPhone" placeholder="+689 XX XX XX">
+              </div>
+              <div class="form-group">
+                <label for="bookCompany">Nom de l'entreprise</label>
+                <input type="text" id="bookCompany" placeholder="Votre commerce">
+              </div>
+              <div class="form-group">
+                <label for="bookSector">Secteur d'activité</label>
+                <select id="bookSector">
+                  <option value="">Sélectionnez</option>
+                  <option value="restaurant">🍽️ Restaurant</option>
+                  <option value="immobilier">🏠 Immobilier</option>
+                  <option value="auto">🚗 Auto-Moto</option>
+                  <option value="hotel">🏨 Hôtellerie-Tourisme</option>
+                  <option value="coiffure">💇 Coiffure</option>
+                  <option value="autre">📋 Autre</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="bookMessage">Message (optionnel)</label>
+                <textarea id="bookMessage" placeholder="Décrivez brièvement votre projet ou vos attentes..."
+                  style="min-height:80px;"></textarea>
+              </div>
+
+              <!-- Booking Summary -->
+              <div id="bookingSummary"
+                style="display:none; margin-bottom:20px; padding:16px; background:rgba(170,255,0,0.06); border:1px solid rgba(170,255,0,0.2); border-radius:var(--radius-md);">
+                <h4 style="font-size:0.9rem; color:var(--primary); margin-bottom:8px;">📋 Récapitulatif</h4>
+                <div style="font-size:0.85rem; color:var(--text-secondary);">
+                  <div>📅 Date : <strong id="summaryDate" style="color:var(--text-primary);">—</strong></div>
+                  <div>🕐 Heure : <strong id="summaryTime" style="color:var(--text-primary);">—</strong></div>
+                  <div>📹 Type : <strong id="summaryType" style="color:var(--text-primary);">Call vidéo</strong></div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="width:100%;" id="bookSubmitBtn" disabled>
+                ✅ Confirmer le rendez-vous
+              </button>
+            </form>
+          </div>
+
+          <!-- Info Card -->
+          <div class="glass-card" style="padding:20px; margin-top:20px; border-color:rgba(170,255,0,0.25);">
+            <h4 style="font-size:0.9rem; color:var(--primary); margin-bottom:8px;">🎁 RDV 100% gratuit</h4>
+            <p style="color:var(--text-secondary); font-size:0.85rem;">
+              Pas d'engagement. Nous vous présentons PropulsIA et répondons à toutes vos questions. En présentiel
+              ou en call vidéo, c'est vous qui choisissez !
+            </p>
+            <p style="color:var(--text-muted); font-size:0.8rem; margin-top:8px;">
+              📧 Confirmation automatique par email · ⏰ Rappel J-1 automatique
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal glass-card" style="text-align:center;">
+      <div style="font-size:4rem; margin-bottom:16px;">🎉</div>
+      <h3>Rendez-vous confirmé !</h3>
+      <p>Vous recevrez un email de confirmation à <strong id="confirmEmail"></strong> avec tous les détails.</p>
+      <div
+        style="padding:16px; background:rgba(170,255,0,0.06); border:1px solid rgba(170,255,0,0.2); border-radius:var(--radius-md); margin-bottom:24px;">
+        <div style="font-size:0.9rem; color:var(--text-secondary);">
+          <div>📅 <strong id="confirmDate" style="color:var(--text-primary);"></strong></div>
+          <div>🕐 <strong id="confirmTime" style="color:var(--text-primary);"></strong></div>
+          <div>📹 <strong id="confirmType" style="color:var(--text-primary);"></strong></div>
+        </div>
+      </div>
+      <div style="display:flex; gap:12px;">
+        <a href="index.html" class="btn btn-secondary" style="flex:1;">Retour à l'accueil</a>
+        <a href="demo.html" class="btn btn-primary" style="flex:1;">Essayer la démo</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer" style="margin-top:80px;">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:none; padding-top:0;">
+        <span>© 2026 PropulsIA — propulsia.io. Tous droits réservés.</span>
+        <a href="index.html" style="color:var(--primary);">← Retour à l'accueil</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast">
+    <span id="toastIcon">✅</span>
+    <span id="toastMessage"></span>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script src="js/booking.js"></script>
+</body>
+
+</html>

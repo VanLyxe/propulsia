@@ -1,0 +1,512 @@
+// ===========================
+// AGENCE IA - Auth Module (Supabase)
+// ===========================
+
+// --- Auth Tab Switching ---
+function switchAuthTab(tab) {
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+  const tabs = document.querySelectorAll('.auth-tab');
+
+  if (!loginForm || !registerForm) return;
+
+  tabs.forEach(t => t.classList.remove('active'));
+
+  if (tab === 'login') {
+    loginForm.style.display = 'block';
+    registerForm.style.display = 'none';
+    tabs[0]?.classList.add('active');
+  } else {
+    loginForm.style.display = 'none';
+    registerForm.style.display = 'block';
+    tabs[1]?.classList.add('active');
+  }
+}
+
+// --- Login ---
+async function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail')?.value;
+  const password = document.getElementById('loginPassword')?.value;
+
+  if (!email || !password) return;
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
+
+    if (error) throw error;
+
+    const userMeta = data.user.user_metadata || {};
+    const name = userMeta.first_name || email.split('@')[0];
+
+    showToast('✅', `Bienvenue ${name} ! Redirection en cours...`);
+    
+    setTimeout(() => {
+      window.location.href = 'production.html';
+    }, 1500);
+  } catch (error) {
+    showToast('⚠️', 'Email ou mot de passe incorrect.');
+    console.error('Login error:', error.message);
+  }
+}
+
+// --- Register ---
+async function handleRegister(e) {
+  e.preventDefault();
+  const firstName = document.getElementById('regFirstName')?.value;
+  const lastName = document.getElementById('regLastName')?.value;
+  const email = document.getElementById('regEmail')?.value;
+  const password = document.getElementById('regPassword')?.value;
+  const confirm = document.getElementById('regPasswordConfirm')?.value;
+
+  if (password !== confirm) {
+    showToast('⚠️', 'Les mots de passe ne correspondent pas.');
+    return;
+  }
+
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        emailRedirectTo: (window.location.hostname === 'localhost' ? 'http://127.0.0.1:5500' : window.location.origin) + '/verify-email.html',
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          company: document.getElementById('regCompany')?.value || '',
+          role: 'prospect',
+          plan: 'discover'
+        }
+      }
+    });
+
+    if (error) throw error;
+
+    // Vérifier si la confirmation d'email est requise
+    if (data.user && data.user.identities && data.user.identities.length === 0) {
+      showToast('⚠️', 'Cet email est déjà enregistré. Veuillez vous connecter.');
+      return;
+    }
+
+    // Rediriger vers la page d'attente de vérification
+    showToast('🎉', 'Inscription réussie ! Vérifiez votre email pour activer votre compte.');
+    
+    setTimeout(() => {
+      window.location.href = 'verify-email.html?pending=true&email=' + encodeURIComponent(email);
+    }, 2000);
+  } catch (error) {
+    showToast('⚠️', 'Erreur lors de l\'inscription: ' + error.message);
+    console.error('Register error:', error.message);
+  }
+}
+
+// --- Check Auth & Access Control ---
+async function checkAuth() {
+  if (!supabase) return null;
+  const { data, error } = await supabase.auth.getSession();
+  if (error || !data || !data.session) return null;
+  return data.session.user;
+}
+
+async function requireAuth(redirectTo = 'login.html') {
+  const user = await checkAuth();
+  if (!user) {
+    window.location.href = redirectTo;
+    return null;
+  }
+  return user;
+}
+
+async function hasAccess(requiredRole) {
+  const user = await checkAuth();
+  if (!user) return false;
+
+  const role = user.user_metadata?.role || 'prospect';
+  const roleHierarchy = { admin: 3, subscriber: 2, prospect: 1 };
+  return (roleHierarchy[role] || 0) >= (roleHierarchy[requiredRole] || 0);
+}
+
+// --- Logout ---
+async function logout() {
+  if (supabase) {
+    await supabase.auth.signOut();
+  }
+  window.location.href = 'index.html';
+}
+
+// --- Subscription Plans ---
+function toggleBilling(type) {
+  const monthlyBtn = document.getElementById('billingMonthly');
+  const annualBtn = document.getElementById('billingAnnual');
+  const pricePro = document.getElementById('pricePro');
+
+  if (!monthlyBtn || !annualBtn) return;
+
+  if (type === 'monthly') {
+    monthlyBtn.style.background = 'var(--gradient-primary)';
+    monthlyBtn.style.color = 'white';
+    annualBtn.style.background = 'transparent';
+    annualBtn.style.color = 'var(--text-muted)';
+    if (pricePro) pricePro.innerHTML = '29 900 <span>XPF/mois</span>';
+  } else {
+    annualBtn.style.background = 'var(--gradient-primary)';
+    annualBtn.style.color = 'white';
+    monthlyBtn.style.background = 'transparent';
+    monthlyBtn.style.color = 'var(--text-muted)';
+    if (pricePro) pricePro.innerHTML = '23 900 <span>XPF/mois</span>';
+  }
+}
+
+function selectPlan(plan) {
+  const modal = document.getElementById('subModal');
+  if (!modal) return;
+
+  const icon = document.getElementById('subModalIcon');
+  const title = document.getElementById('subModalTitle');
+  const desc = document.getElementById('subModalDesc');
+
+  switch (plan) {
+    case 'discover':
+      if (icon) icon.textContent = '🆓';
+      if (title) title.textContent = 'Plan Découverte';
+      if (desc) desc.textContent = 'Créez votre compte gratuit pour commencer à utiliser nos outils.';
+      // For free plan, hide card fields
+      const cardField = document.getElementById('subCard');
+      if (cardField) cardField.parentElement.style.display = 'none';
+      break;
+    case 'pro':
+      if (icon) icon.textContent = '⭐';
+      if (title) title.textContent = 'Abonnement Professionnel';
+      if (desc) desc.textContent = 'Débloquez tous les outils de production IA.';
+      break;
+  }
+
+  modal.classList.add('active');
+}
+
+async function processSubscription(e) {
+  e.preventDefault();
+  const email = document.getElementById('subEmail')?.value;
+
+  if (!email) return;
+
+  const user = await checkAuth();
+  if (!user) {
+    showToast('⚠️', 'Veuillez vous connecter ou vous inscrire avant de vous abonner.');
+    // Let's redirect to login and pass intent if necessary, or just warn
+    return;
+  }
+
+  try {
+    // Save subscription logic securely in Supabase metadata
+    const { data, error } = await supabase.auth.updateUser({
+      data: {
+        role: 'subscriber',
+        plan: 'pro',
+        subscribeTime: new Date().toISOString()
+      }
+    });
+
+    if (error) throw error;
+
+    document.getElementById('subModal').classList.remove('active');
+    showToast('🎉', 'Abonnement activé avec succès ! Bienvenue dans l\'espace Pro !');
+
+    setTimeout(() => {
+      window.location.href = 'production.html';
+    }, 2000);
+  } catch (error) {
+    showToast('⚠️', 'Erreur lors de l\'activation: ' + error.message);
+  }
+}
+
+// ===========================
+// PASSWORD RESET FUNCTIONS
+// ===========================
+
+// --- Forgot Password : Request reset link ---
+async function handleForgotPassword(e) {
+  e.preventDefault();
+  const email = document.getElementById('forgotEmail')?.value;
+  const btn = document.getElementById('forgotBtn');
+
+  if (!email) {
+    showToast('⚠️', 'Veuillez entrer votre adresse email.');
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Envoi en cours...';
+  }
+
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: (window.location.hostname === 'localhost' ? 'http://127.0.0.1:5500' : window.location.origin) + '/reset-password.html',
+    });
+
+    if (error) throw error;
+
+    // Afficher l'étape 2
+    document.getElementById('forgotStep1').style.display = 'none';
+    document.getElementById('forgotStep2').style.display = 'block';
+    document.getElementById('sentEmail').textContent = email;
+
+    showToast('✅', 'Email de réinitialisation envoyé !');
+  } catch (error) {
+    showToast('⚠️', 'Erreur : ' + error.message);
+    console.error('Forgot password error:', error.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Envoyer le lien →';
+    }
+  }
+}
+
+// --- Resend reset email ---
+async function resendResetEmail() {
+  const email = document.getElementById('sentEmail')?.textContent;
+  const btn = document.getElementById('resendBtn');
+
+  if (!email) return;
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Envoi...';
+  }
+
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: (window.location.hostname === 'localhost' ? 'http://127.0.0.1:5500' : window.location.origin) + '/reset-password.html',
+    });
+
+    if (error) throw error;
+
+    showToast('✅', 'Email renvoyé avec succès !');
+  } catch (error) {
+    showToast('⚠️', 'Erreur : ' + error.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '🔄 Renvoyer l\'email';
+    }
+  }
+}
+
+// --- Check password strength ---
+function checkPasswordStrength(password) {
+  const strengthBar = document.getElementById('strengthBar');
+  const strengthText = document.getElementById('strengthText');
+
+  if (!strengthBar || !strengthText) return;
+
+  let strength = 0;
+  if (password.length >= 8) strength++;
+  if (password.length >= 12) strength++;
+  if (/[A-Z]/.test(password)) strength++;
+  if (/[0-9]/.test(password)) strength++;
+  if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+  const colors = ['#ef4444', '#f97316', '#fbbf24', '#84cc16', '#22c55e'];
+  const texts = ['Très faible', 'Faible', 'Moyen', 'Fort', 'Très fort'];
+
+  const level = Math.min(strength, 5);
+  const percentage = (level / 5) * 100;
+
+  strengthBar.style.width = percentage + '%';
+  strengthBar.style.backgroundColor = colors[level - 1] || '#ef4444';
+  strengthText.textContent = level > 0 ? texts[level - 1] : '';
+  strengthText.style.color = colors[level - 1] || '#ef4444';
+}
+
+// --- Reset Password : Set new password ---
+async function handleResetPassword(e) {
+  e.preventDefault();
+  const newPassword = document.getElementById('newPassword')?.value;
+  const confirmPassword = document.getElementById('confirmNewPassword')?.value;
+  const btn = document.getElementById('resetBtn');
+
+  if (!newPassword || !confirmPassword) {
+    showToast('⚠️', 'Veuillez remplir tous les champs.');
+    return;
+  }
+
+  if (newPassword.length < 8) {
+    showToast('⚠️', 'Le mot de passe doit contenir au moins 8 caractères.');
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    showToast('⚠️', 'Les mots de passe ne correspondent pas.');
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Mise à jour...';
+  }
+
+  try {
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword
+    });
+
+    if (error) throw error;
+
+    document.getElementById('resetForm').style.display = 'none';
+    document.getElementById('resetSuccess').style.display = 'block';
+
+    showToast('🎉', 'Mot de passe mis à jour avec succès !');
+  } catch (error) {
+    showToast('⚠️', 'Erreur : ' + error.message);
+    console.error('Reset password error:', error.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Mettre à jour le mot de passe →';
+    }
+  }
+}
+
+// --- Verify reset token on page load ---
+async function verifyResetToken() {
+  const hash = window.location.hash;
+  const params = new URLSearchParams(hash.replace('#', '?'));
+  const accessToken = params.get('access_token');
+  const refreshToken = params.get('refresh_token');
+  const type = params.get('type');
+
+  const loadingDiv = document.getElementById('resetLoading');
+  const formDiv = document.getElementById('resetForm');
+  const errorDiv = document.getElementById('resetError');
+
+  if (!loadingDiv || !formDiv || !errorDiv) return;
+
+  // Vérifier si c'est bien une récupération de mot de passe
+  if (type !== 'recovery' || !accessToken) {
+    loadingDiv.style.display = 'none';
+    errorDiv.style.display = 'block';
+    return;
+  }
+
+  try {
+    // Échanger le token pour établir une session
+    const { data, error } = await supabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken || ''
+    });
+
+    if (error) throw error;
+
+    // Token valide, afficher le formulaire
+    loadingDiv.style.display = 'none';
+    formDiv.style.display = 'block';
+
+    showToast('✅', 'Lien vérifié. Définissez votre nouveau mot de passe.');
+  } catch (error) {
+    console.error('Token verification error:', error.message);
+    loadingDiv.style.display = 'none';
+    errorDiv.style.display = 'block';
+  }
+}
+
+// ===========================
+// EMAIL VERIFICATION FUNCTIONS
+// ===========================
+
+// --- Check if email needs verification after registration ---
+async function checkEmailVerification(user) {
+  if (!user) return false;
+
+  // Vérifier si l'email est confirmé
+  if (user.email_confirmed_at) {
+    return true;
+  }
+
+  // L'email n'est pas confirmé
+  return false;
+}
+
+// --- Resend verification email ---
+async function resendVerificationEmail(email) {
+  try {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email,
+      options: {
+        emailRedirectTo: window.location.origin + '/verify-email.html'
+      }
+    });
+
+    if (error) throw error;
+
+    showToast('✅', 'Email de vérification renvoyé !');
+  } catch (error) {
+    showToast('⚠️', 'Erreur : ' + error.message);
+    console.error('Resend verification error:', error.message);
+  }
+}
+
+// --- Verify email token on page load ---
+async function verifyEmailToken() {
+  const hash = window.location.hash;
+  const params = new URLSearchParams(hash.replace('#', '?'));
+  const accessToken = params.get('access_token');
+  const refreshToken = params.get('refresh_token');
+  const type = params.get('type');
+
+  const loadingDiv = document.getElementById('verifyLoading');
+  const successDiv = document.getElementById('verifySuccess');
+  const errorDiv = document.getElementById('verifyError');
+
+  if (!loadingDiv || !successDiv || !errorDiv) return;
+
+  // Vérifier si c'est bien une confirmation d'email
+  if (type === 'signup' && accessToken) {
+    try {
+      const { data, error } = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken || ''
+      });
+
+      if (error) throw error;
+
+      loadingDiv.style.display = 'none';
+      successDiv.style.display = 'block';
+
+      showToast('🎉', 'Email confirmé avec succès !');
+    } catch (error) {
+      console.error('Email verification error:', error.message);
+      loadingDiv.style.display = 'none';
+      errorDiv.style.display = 'block';
+    }
+  } else {
+    // Pas de token dans l'URL, vérifier la session
+    const { data } = await supabase.auth.getSession();
+    if (data.session?.user?.email_confirmed_at) {
+      loadingDiv.style.display = 'none';
+      successDiv.style.display = 'block';
+    } else {
+      loadingDiv.style.display = 'none';
+      errorDiv.style.display = 'block';
+    }
+  }
+}
+
+// --- FAQ Toggle ---
+function toggleFaq(header) {
+  const content = header.nextElementSibling;
+  const arrow = header.querySelector('span');
+
+  if (content.style.display === 'none' || !content.style.display) {
+    content.style.display = 'block';
+    if (arrow) arrow.style.transform = 'rotate(180deg)';
+  } else {
+    content.style.display = 'none';
+    if (arrow) arrow.style.transform = 'rotate(0deg)';
+  }
+}

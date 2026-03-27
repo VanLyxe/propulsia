@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Vérification de votre email PropulsIA.">
+  <title>Vérification email — PropulsIA</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+
+<body>
+  <div class="auth-page">
+    <div
+      style="position:absolute; top:-20%; left:-10%; width:500px; height:500px; background:radial-gradient(circle, rgba(170,255,0,0.07) 0%, transparent 70%); border-radius:50%; animation: float 8s ease-in-out infinite;">
+    </div>
+    <div
+      style="position:absolute; bottom:-20%; right:-10%; width:400px; height:400px; background:radial-gradient(circle, rgba(120,200,0,0.05) 0%, transparent 70%); border-radius:50%; animation: float 10s ease-in-out infinite reverse;">
+    </div>
+
+    <div class="auth-card glass-card">
+      <div style="text-align:center; margin-bottom:32px;">
+        <a href="index.html" class="logo" style="justify-content:center; margin-bottom:12px;">
+          <div class="logo-icon">⚡</div>
+          <span>PropulsIA</span>
+        </a>
+        <p style="color:var(--text-muted); font-size:0.9rem;">Vérification de l'email</p>
+      </div>
+
+      <!-- État de chargement -->
+      <div id="verifyLoading" style="text-align:center; padding:40px 0;">
+        <div style="font-size:3rem; margin-bottom:16px;">⏳</div>
+        <p style="color:var(--text-muted);">Vérification de votre email...</p>
+      </div>
+
+      <!-- En attente de vérification (après inscription) -->
+      <div id="verifyPending" style="display:none;">
+        <div style="text-align:center; padding:24px 0;">
+          <div style="font-size:4rem; margin-bottom:16px;">📧</div>
+          <h2 style="font-size:1.3rem; margin-bottom:12px; color:var(--primary);">Vérifiez votre email !</h2>
+          <p style="color:var(--text-secondary); margin-bottom:8px;">
+            Un email de confirmation a été envoyé à <strong id="pendingEmail"></strong>
+          </p>
+          <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:24px;">
+            Cliquez sur le lien dans l'email pour activer votre compte.<br>
+            Le lien est valable pendant 1 heure.
+          </p>
+          <div style="background:var(--bg-dark); padding:16px; border-radius:var(--radius-md); margin-bottom:24px;">
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">Vous n'avez pas reçu l'email ?</p>
+            <button class="btn btn-secondary btn-sm" onclick="resendVerificationEmailPrompt()" id="resendVerifyBtn">
+              🔄 Renvoyer l'email
+            </button>
+          </div>
+          <a href="login.html" class="btn btn-primary" style="width:100%;">Retour à la connexion</a>
+        </div>
+      </div>
+
+      <!-- Succès -->
+      <div id="verifySuccess" style="display:none;">
+        <div style="text-align:center; padding:24px 0;">
+          <div style="font-size:4rem; margin-bottom:16px;">✅</div>
+          <h2 style="font-size:1.3rem; margin-bottom:12px; color:var(--primary);">Email confirmé !</h2>
+          <p style="color:var(--text-secondary); margin-bottom:24px;">
+            Votre adresse email a été vérifiée avec succès. Votre compte est maintenant actif.
+          </p>
+          <a href="login.html" class="btn btn-primary" style="width:100%;">Se connecter</a>
+        </div>
+      </div>
+
+      <!-- Erreur -->
+      <div id="verifyError" style="display:none;">
+        <div style="text-align:center; padding:24px 0;">
+          <div style="font-size:4rem; margin-bottom:16px;">⚠️</div>
+          <h2 style="font-size:1.3rem; margin-bottom:12px; color:#f87171;">Vérification échouée</h2>
+          <p style="color:var(--text-secondary); margin-bottom:16px;">
+            Le lien de vérification est invalide ou a expiré.
+          </p>
+          <div style="background:var(--bg-dark); padding:16px; border-radius:var(--radius-md); margin-bottom:24px;">
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:8px;">
+              Vous n'avez pas reçu l'email de confirmation ?
+            </p>
+            <button class="btn btn-secondary btn-sm" onclick="resendVerificationEmailPrompt()" id="resendVerifyBtn">
+              🔄 Renvoyer l'email de confirmation
+            </button>
+          </div>
+          <a href="login.html" class="btn btn-primary" style="width:100%;">Retour à la connexion</a>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top:24px;">
+        <a href="login.html" style="font-size:0.85rem; color:var(--text-muted);">← Retour à la connexion</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <span id="toastIcon">✅</span>
+    <span id="toastMessage"></span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Appeler la vérification au chargement de la page
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isPending = urlParams.get('pending') === 'true';
+      const email = urlParams.get('email');
+
+      if (isPending && email) {
+        // Afficher l'état "en attente"
+        document.getElementById('verifyLoading').style.display = 'none';
+        document.getElementById('verifyPending').style.display = 'block';
+        document.getElementById('pendingEmail').textContent = decodeURIComponent(email);
+      } else {
+        // Vérifier le token dans l'URL
+        verifyEmailToken();
+      }
+    });
+
+    // Fonction pour renvoyer l'email de vérification
+    async function resendVerificationEmailPrompt() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const emailFromUrl = urlParams.get('email');
+      const email = emailFromUrl ? decodeURIComponent(emailFromUrl) : prompt('Veuillez entrer votre adresse email :');
+      if (email) {
+        await resendVerificationEmail(email);
+      }
+    }
+  </script>
+</body>
+
+</html>

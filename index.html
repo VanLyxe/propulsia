@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="PropulsIA — Solutions d'automatisation IA pour TPE & PME. Génération d'images, vidéos et contenus marketing par intelligence artificielle pour les commerces de Polynésie.">
+  <title>PropulsIA — L'IA au Service de Votre Entreprise | Polynésie</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header" id="header">
+    <div class="container">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">⚡</div>
+        <span>PropulsIA</span>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="#about">À propos</a>
+        <a href="#services">Services</a>
+        <a href="#pricing">Tarifs</a>
+        <a href="booking.html" style="color: var(--primary);">Planifier un RDV</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <div class="nav-cta">
+        <a href="login.html" class="btn btn-secondary btn-sm">Connexion</a>
+        <a href="demo.html" class="btn btn-primary btn-sm">✨ Essayer la démo</a>
+      </div>
+
+      <div class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation -->
+  <div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-close" onclick="toggleMobileMenu()">✕</div>
+    <a href="#about" onclick="toggleMobileMenu()">À propos</a>
+    <a href="#services" onclick="toggleMobileMenu()">Services</a>
+    <a href="#pricing" onclick="toggleMobileMenu()">Tarifs</a>
+    <a href="booking.html" onclick="toggleMobileMenu()">Planifier un RDV</a>
+    <a href="#faq" onclick="toggleMobileMenu()">FAQ</a>
+    <a href="demo.html" class="btn btn-primary">✨ Essayer la démo</a>
+    <a href="login.html" class="btn btn-secondary">Connexion</a>
+  </div>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="hero">
+    <div class="particles" id="particles"></div>
+    <div class="container" style="display:flex; align-items:center; width:100%;">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="pulse-dot"></span>
+          TPE &amp; PME — Solutions d'automatisation IA
+        </div>
+        <h1><span class="gradient-text">L'IA au Service</span><br>de Votre<br>Entreprise</h1>
+        <p>PropulsIA transforme vos médias commerciaux en contenus professionnels en quelques clics. Images, vidéos,
+          campagnes email — tout automatisé par l'intelligence artificielle.</p>
+        <div class="hero-buttons">
+          <a href="demo.html" class="btn btn-primary btn-lg">✨ Essayer la démo gratuite</a>
+          <a href="booking.html" class="btn btn-secondary btn-lg">📅 Planifier un RDV</a>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="hero-grid">
+          <div class="hero-grid-item">
+            <div class="icon">🖼️</div>
+            <h4>Images IA</h4>
+            <p>Photos améliorées 2K / 4K</p>
+          </div>
+          <div class="hero-grid-item">
+            <div class="icon">🎬</div>
+            <h4>Vidéos</h4>
+            <p>Clips promotionnels auto-générés</p>
+          </div>
+          <div class="hero-grid-item">
+            <div class="icon">📧</div>
+            <h4>Emails &amp; DM</h4>
+            <p>Campagnes automatisées</p>
+          </div>
+          <div class="hero-grid-item">
+            <div class="icon">📊</div>
+            <h4>Analytics</h4>
+            <p>Suivi de performances</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ABOUT / À PROPOS ===== -->
+  <section class="section" id="about" style="background: var(--bg-surface);">
+    <div class="container">
+      <h2 class="section-title reveal">Qui sommes-nous ?</h2>
+      <p class="section-subtitle reveal">Une agence 100% dédiée à l'intelligence artificielle au service des commerces
+        polynésiens.</p>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;" class="reveal">
+        <div>
+          <h3 style="font-size:1.5rem; margin-bottom:16px;">L'IA au service de votre business</h3>
+          <p style="color: var(--text-secondary); margin-bottom: 20px; line-height: 1.8;">
+            Basée en Polynésie française, <strong style="color: var(--primary);">PropulsIA</strong> est la
+            première plateforme SaaS dédiée à la création de contenus visuels et marketing par intelligence artificielle
+            pour les commerces locaux.
+          </p>
+          <p style="color: var(--text-secondary); margin-bottom: 24px; line-height: 1.8;">
+            De la photo de votre restaurant au clip vidéo promotionnel de votre hôtel, notre technologie transforme vos
+            visuels bruts en contenus professionnels prêts à publier — en quelques secondes.
+          </p>
+          <div style="display:flex; gap:32px; flex-wrap:wrap;">
+            <div>
+              <div
+                style="font-size:2.5rem; font-weight:900; background: var(--gradient-primary); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">
+                500+</div>
+              <div style="color: var(--text-muted); font-size: 0.85rem;">Images générées</div>
+            </div>
+            <div>
+              <div
+                style="font-size:2.5rem; font-weight:900; background: var(--gradient-primary); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">
+                50+</div>
+              <div style="color: var(--text-muted); font-size: 0.85rem;">Clients satisfaits</div>
+            </div>
+            <div>
+              <div
+                style="font-size:2.5rem; font-weight:900; background: var(--gradient-primary); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">
+                5</div>
+              <div style="color: var(--text-muted); font-size: 0.85rem;">Secteurs couverts</div>
+            </div>
+          </div>
+        </div>
+        <div class="glass-card" style="padding:40px; text-align:center;">
+          <div style="font-size:5rem; margin-bottom:20px;">🏝️</div>
+          <h3 style="font-size:1.3rem; margin-bottom:12px;">Made in Polynésie</h3>
+          <p style="color: var(--text-secondary); font-size: 0.95rem;">Notre solution est conçue spécifiquement pour le
+            marché polynésien, avec des préréglages visuels adaptés à l'esthétique locale : lumière tropicale, flore
+            luxuriante et architecture traditionnelle.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SERVICES / FEATURES ===== -->
+  <section class="section" id="services">
+    <div class="container">
+      <h2 class="section-title reveal">Nos Services</h2>
+      <p class="section-subtitle reveal">Un écosystème complet de création de contenus propulsé par l'IA, aligné sur
+        votre workflow de production.</p>
+
+      <div class="features-grid">
+        <div class="feature-card glass-card reveal">
+          <div class="feature-icon">🖼️</div>
+          <h3>Génération d'Images</h3>
+          <p>Améliorez et transformez vos photos commerciales avec notre IA. Retouche automatique, mise en valeur des
+            produits, ambiance lumineuse optimisée.</p>
+          <div class="feature-tags">
+            <span class="feature-tag">Avant / Après</span>
+            <span class="feature-tag">2K / 4K</span>
+            <span class="feature-tag">Multi-styles</span>
+            <span class="feature-tag">Batch</span>
+          </div>
+        </div>
+
+        <div class="feature-card glass-card reveal">
+          <div class="feature-icon">🎬</div>
+          <h3>Génération de Vidéos</h3>
+          <p>Créez des clips vidéo promotionnels courts et percutants à partir de vos photos. Transitions dynamiques,
+            musique intégrée, formats réseaux sociaux.</p>
+          <div class="feature-tags">
+            <span class="feature-tag">Clips courts</span>
+            <span class="feature-tag">Réseaux sociaux</span>
+            <span class="feature-tag">Auto-montage</span>
+          </div>
+        </div>
+
+        <div class="feature-card glass-card reveal">
+          <div class="feature-icon">📧</div>
+          <h3>Emails &amp; DM Automatisés</h3>
+          <p>Générez des campagnes email et messages directs personnalisés automatiquement. Rédaction IA, templates
+            sectoriels, envoi planifié.</p>
+          <div class="feature-tags">
+            <span class="feature-tag">Campagnes email</span>
+            <span class="feature-tag">DM Instagram</span>
+            <span class="feature-tag">Auto-envoi</span>
+          </div>
+        </div>
+
+        <div class="feature-card glass-card reveal">
+          <div class="feature-icon">🎯</div>
+          <h3>Démo Avant-Vente</h3>
+          <p>Impressionnez vos prospects en temps réel : uploadez leur photo, lancez l'analyse IA et montrez le résultat
+            Avant/Après instantanément.</p>
+          <div class="feature-tags">
+            <span class="feature-tag">Temps réel</span>
+            <span class="feature-tag">Drag &amp; Drop</span>
+            <span class="feature-tag">Impact visuel</span>
+          </div>
+        </div>
+
+        <div class="feature-card glass-card reveal">
+          <div class="feature-icon">🔍</div>
+          <h3>Recherche d'Établissements</h3>
+          <p>Détection automatique d'opportunités commerciales. Analyse des images Google, TripAdvisor et réseaux
+            sociaux par secteur d'activité.</p>
+          <div class="feature-tags">
+            <span class="feature-tag">Google Maps</span>
+            <span class="feature-tag">TripAdvisor</span>
+            <span class="feature-tag">Auto-détection</span>
+          </div>
+        </div>
+
+        <div class="feature-card glass-card reveal">
+          <div class="feature-icon">💾</div>
+          <h3>Espace Production Abonné</h3>
+          <p>Accès à votre dashboard personnel sécurisé (login + mot de passe). Tous vos contenus sauvegardés,
+            historique complet et téléchargement rapide.</p>
+          <div class="feature-tags">
+            <span class="feature-tag">Dashboard</span>
+            <span class="feature-tag">Historique</span>
+            <span class="feature-tag">Cloud sécurisé</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SECTORS ===== -->
+  <section class="section" id="sectors" style="background: var(--bg-surface);">
+    <div class="container">
+      <h2 class="section-title reveal">Secteurs Couverts</h2>
+      <p class="section-subtitle reveal">Notre IA est entraînée pour optimiser les visuels de 5 secteurs clés en
+        Polynésie.</p>
+
+      <div class="sectors-grid">
+        <div class="sector-card glass-card reveal">
+          <span class="sector-icon">🍽️</span>
+          <h4>Restaurants</h4>
+          <p>Photos de plats, ambiance, terrasses, mise en valeur culinaire.</p>
+        </div>
+        <div class="sector-card glass-card reveal">
+          <span class="sector-icon">🏠</span>
+          <h4>Agences Immobilières</h4>
+          <p>Photos d'intérieur, extérieur, home staging virtuel.</p>
+        </div>
+        <div class="sector-card glass-card reveal">
+          <span class="sector-icon">🚗</span>
+          <h4>Concessionnaires Auto</h4>
+          <p>Véhicules, showroom, détails mécaniques.</p>
+        </div>
+        <div class="sector-card glass-card reveal">
+          <span class="sector-icon">🏨</span>
+          <h4>Hôtellerie &amp; Tourisme</h4>
+          <p>Chambres, piscines, paysages, expériences.</p>
+        </div>
+        <div class="sector-card glass-card reveal">
+          <span class="sector-icon">💇</span>
+          <h4>Salons de Coiffure</h4>
+          <p>Coupes, colorations, ambiance salon.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRICING ===== -->
+  <section class="section" id="pricing">
+    <div class="container">
+      <h2 class="section-title reveal">Nos Tarifs</h2>
+      <p class="section-subtitle reveal">Des formules flexibles adaptées à chaque besoin, de la découverte à
+        l'entreprise.</p>
+
+      <div class="pricing-grid">
+        <!-- Plan Découverte -->
+        <div class="pricing-card glass-card reveal">
+          <div class="pricing-name">Découverte</div>
+          <div class="pricing-price">Gratuit</div>
+          <div class="pricing-desc">Idéal pour tester nos services — par tâche</div>
+          <ul class="pricing-features">
+            <li><span class="check">✓</span> 3 générations d'images / mois</li>
+            <li><span class="check">✓</span> Comparateur Avant / Après</li>
+            <li><span class="check">✓</span> Format 2K</li>
+            <li><span class="check">✓</span> 1 secteur d'activité</li>
+            <li><span class="check" style="color: var(--primary);">⚡</span> Logo PropulsIA en filigrane</li>
+            <li class="disabled"><span class="check">✗</span> Génération de vidéos</li>
+            <li class="disabled"><span class="check">✗</span> Campagnes email</li>
+            <li class="disabled"><span class="check">✗</span> Batch processing</li>
+          </ul>
+          <a href="subscribe.html" class="btn btn-secondary" style="width:100%;">Commencer gratuitement</a>
+        </div>
+
+        <!-- Plan Pro -->
+        <div class="pricing-card glass-card featured reveal">
+          <div class="pricing-badge">⭐ Populaire</div>
+          <div class="pricing-name">Professionnel</div>
+          <div class="pricing-price">29 900 <span>XPF/mois</span></div>
+          <div class="pricing-desc">Pour les commerces actifs — accès complet</div>
+          <ul class="pricing-features">
+            <li><span class="check">✓</span> Images illimitées</li>
+            <li><span class="check">✓</span> Formats 2K &amp; 4K</li>
+            <li><span class="check">✓</span> Tous les secteurs</li>
+            <li><span class="check">✓</span> 10 vidéos / mois</li>
+            <li><span class="check">✓</span> Campagnes email (100/mois)</li>
+            <li><span class="check">✓</span> Batch processing</li>
+            <li><span class="check">✓</span> Sans filigrane</li>
+            <li><span class="check">✓</span> Support prioritaire</li>
+          </ul>
+          <a href="subscribe.html" class="btn btn-primary" style="width:100%;">Choisir ce plan</a>
+        </div>
+
+        <!-- Plan Entreprise -->
+        <div class="pricing-card glass-card reveal">
+          <div class="pricing-name">Entreprise</div>
+          <div class="pricing-price">Sur mesure</div>
+          <div class="pricing-desc">Pour les agences et grands comptes</div>
+          <ul class="pricing-features">
+            <li><span class="check">✓</span> Tout le plan Pro</li>
+            <li><span class="check">✓</span> Vidéos illimitées</li>
+            <li><span class="check">✓</span> Emails illimités</li>
+            <li><span class="check">✓</span> API personnalisée</li>
+            <li><span class="check">✓</span> Marque blanche</li>
+            <li><span class="check">✓</span> Onboarding dédié</li>
+            <li><span class="check">✓</span> Manager de compte</li>
+          </ul>
+          <a href="booking.html" class="btn btn-accent" style="width:100%;">Nous contacter</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="section" id="faq" style="background: var(--bg-surface);">
+    <div class="container">
+      <h2 class="section-title reveal">Questions Fréquentes</h2>
+      <p class="section-subtitle reveal">Tout ce que vous devez savoir sur PropulsIA.</p>
+
+      <div style="max-width: 780px; margin: 0 auto;">
+        <div class="glass-card reveal" style="margin-bottom:12px;">
+          <div
+            style="padding:20px 24px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;"
+            onclick="toggleFaq(this)">
+            <strong style="font-size:0.95rem;">À quoi sert le filigrane PropulsIA sur le plan Gratuit ?</strong>
+            <span style="color:var(--primary); transition:transform 0.3s ease;">▼</span>
+          </div>
+          <div style="padding:0 24px 20px; display:none; color:var(--text-secondary); font-size:0.9rem;">
+            Sur le plan Découverte (gratuit), les images générées affichent le logo PropulsIA en bas à droite — comme le
+            marqueur Gemini. C'est notre façon de vous offrir un service gratuit tout en faisant connaître notre agence.
+            Il disparaît avec un abonnement payant.
+          </div>
+        </div>
+        <div class="glass-card reveal" style="margin-bottom:12px;">
+          <div
+            style="padding:20px 24px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;"
+            onclick="toggleFaq(this)">
+            <strong style="font-size:0.95rem;">Comment fonctionne la prise de RDV en ligne ?</strong>
+            <span style="color:var(--primary); transition:transform 0.3s ease;">▼</span>
+          </div>
+          <div style="padding:0 24px 20px; display:none; color:var(--text-secondary); font-size:0.9rem;">
+            Sur notre page "Planifier un RDV", vous choisissez une date et un créneau disponible, puis vous remplissez
+            vos coordonnées. Une confirmation par email vous est envoyée immédiatement ainsi qu'un rappel automatique la
+            veille du rendez-vous.
+          </div>
+        </div>
+        <div class="glass-card reveal" style="margin-bottom:12px;">
+          <div
+            style="padding:20px 24px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;"
+            onclick="toggleFaq(this)">
+            <strong style="font-size:0.95rem;">Puis-je changer de plan à tout moment ?</strong>
+            <span style="color:var(--primary); transition:transform 0.3s ease;">▼</span>
+          </div>
+          <div style="padding:0 24px 20px; display:none; color:var(--text-secondary); font-size:0.9rem;">
+            Oui, vous pouvez upgrader ou downgrader votre plan à tout moment depuis votre espace abonné. Le changement
+            prend effet immédiatement et le prorata est calculé automatiquement.
+          </div>
+        </div>
+        <div class="glass-card reveal" style="margin-bottom:12px;">
+          <div
+            style="padding:20px 24px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;"
+            onclick="toggleFaq(this)">
+            <strong style="font-size:0.95rem;">Proposez-vous une période d'essai ?</strong>
+            <span style="color:var(--primary); transition:transform 0.3s ease;">▼</span>
+          </div>
+          <div style="padding:0 24px 20px; display:none; color:var(--text-secondary); font-size:0.9rem;">
+            Absolument ! Le plan Découverte est gratuit sans limite de durée. Nous offrons également 7 jours d'essai
+            gratuit du plan Pro après un RDV de démonstration. Contactez-nous pour en savoir plus.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT ===== -->
+  <section class="section" id="contact">
+    <div class="container">
+      <h2 class="section-title reveal">Contactez-nous</h2>
+      <p class="section-subtitle reveal">Une question ? Un projet ? Parlons-en ensemble.</p>
+
+      <div class="contact-grid reveal">
+        <div class="contact-info">
+          <h3>Restons en contact</h3>
+          <p>Nous sommes disponibles pour répondre à toutes vos questions et vous accompagner dans votre transition vers
+            l'IA.</p>
+
+          <div class="contact-detail">
+            <div class="contact-detail-icon">📍</div>
+            <div>
+              <div style="font-weight:600;">Adresse</div>
+              <div style="color: var(--text-muted); font-size: 0.9rem;">Papeete, Tahiti — Polynésie française</div>
+            </div>
+          </div>
+          <div class="contact-detail">
+            <div class="contact-detail-icon">📧</div>
+            <div>
+              <div style="font-weight:600;">Email</div>
+              <div style="color: var(--text-muted); font-size: 0.9rem;">fgotahiti@gmail.com</div>
+            </div>
+          </div>
+          <div class="contact-detail">
+            <div class="contact-detail-icon">📞</div>
+            <div>
+              <div style="font-weight:600;">Téléphone</div>
+              <div style="color: var(--text-muted); font-size: 0.9rem;">+689 87 73 71 81</div>
+            </div>
+          </div>
+          <div class="contact-detail" style="border:none;">
+            <div class="contact-detail-icon">🕐</div>
+            <div>
+              <div style="font-weight:600;">Horaires</div>
+              <div style="color: var(--text-muted); font-size: 0.9rem;">Lun — Ven : 8h — 17h (GMT-10)</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 32px;">
+            <a href="booking.html" class="btn btn-primary">📅 Planifier un RDV gratuit</a>
+          </div>
+        </div>
+
+        <form class="contact-form glass-card" id="contactForm" onsubmit="handleContactForm(event)">
+          <h3 style="margin-bottom: 24px; font-size: 1.2rem;">Envoyez-nous un message</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="contactName">Nom complet</label>
+              <input type="text" id="contactName" placeholder="Votre nom" required>
+            </div>
+            <div class="form-group">
+              <label for="contactEmail">Email</label>
+              <input type="email" id="contactEmail" placeholder="votre@email.pf" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="contactSector">Secteur d'activité</label>
+            <select id="contactSector">
+              <option value="">Sélectionnez votre secteur</option>
+              <option value="restaurant">🍽️ Restaurant</option>
+              <option value="immobilier">🏠 Agence immobilière</option>
+              <option value="auto">🚗 Concessionnaire auto-moto</option>
+              <option value="hotel">🏨 Hôtellerie - Tourisme</option>
+              <option value="coiffure">💇 Salon de coiffure</option>
+              <option value="autre">📋 Autre</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="contactMessage">Message</label>
+            <textarea id="contactMessage" placeholder="Décrivez votre projet ou votre question..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;">Envoyer le message ✉️</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            <div class="logo-icon">⚡</div>
+            <span>PropulsIA</span>
+          </a>
+          <p>Votre partenaire IA pour la création de contenus visuels et marketing en Polynésie française. propulsia.io
+          </p>
+        </div>
+        <div class="footer-col">
+          <h4>Plateforme</h4>
+          <a href="demo.html">Démo interactive</a>
+          <a href="production.html">Espace production</a>
+          <a href="#pricing">Tarifs</a>
+          <a href="subscribe.html">S'abonner</a>
+        </div>
+        <div class="footer-col">
+          <h4>Entreprise</h4>
+          <a href="#about">À propos</a>
+          <a href="#contact">Contact</a>
+          <a href="booking.html">Planifier un RDV</a>
+          <a href="#">Mentions légales</a>
+        </div>
+        <div class="footer-col">
+          <h4>Ressources</h4>
+          <a href="#">Documentation</a>
+          <a href="#">Blog</a>
+          <a href="#faq">FAQ</a>
+          <a href="#">Politique de confidentialité</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 PropulsIA — propulsia.io. Tous droits réservés.</span>
+        <div class="footer-social">
+          <a href="#" title="Facebook">📘</a>
+          <a href="#" title="Instagram">📸</a>
+          <a href="#" title="LinkedIn">💼</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <span id="toastIcon">✅</span>
+    <span id="toastMessage">Message envoyé avec succès !</span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/main.js"></script>
+</body>
+
+</html>

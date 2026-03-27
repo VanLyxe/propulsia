@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Espace production PropulsIA — Gérez vos générations d'images, vidéos et campagnes email avec notre IA.">
+  <title>Espace Production — PropulsIA</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+
+<body>
+
+  <!-- ===== DASHBOARD LAYOUT ===== -->
+  <div class="dashboard">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <a href="index.html" class="logo">
+          <div class="logo-icon" style="width:32px;height:32px;font-size:1rem;">⚡</div>
+          <span>PropulsIA</span>
+        </a>
+      </div>
+      <!-- Plan badge -->
+      <div
+        style="margin:0 16px 16px; padding:10px 12px; background:rgba(170,255,0,0.06); border:1px solid rgba(170,255,0,0.2); border-radius:var(--radius-md); font-size:0.8rem;">
+        <span style="color:var(--primary);">⚡ Plan Gratuit</span><br>
+        <span style="color:var(--text-muted); font-size:0.75rem;">Logo filigrane actif</span>
+        <a href="subscribe.html"
+          style="display:block; margin-top:6px; color:var(--primary); font-size:0.75rem; font-weight:600;">Passer au Pro
+          →</a>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="active" data-tab="dashboard" onclick="switchTab('dashboard', this)">
+          <span class="nav-icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" data-tab="images" onclick="switchTab('images', this)">
+          <span class="nav-icon">🖼️</span>
+          <span>Images</span>
+        </a>
+        <a href="#" data-tab="videos" onclick="switchTab('videos', this)">
+          <span class="nav-icon">🎬</span>
+          <span>Vidéos</span>
+        </a>
+        <a href="#" data-tab="emails" onclick="switchTab('emails', this)">
+          <span class="nav-icon">📧</span>
+          <span>Emails & DM</span>
+        </a>
+        <a href="#" data-tab="history" onclick="switchTab('history', this)">
+          <span class="nav-icon">📋</span>
+          <span>Historique</span>
+        </a>
+      </nav>
+      <div style="margin-top:auto; padding:16px 24px; border-top:1px solid rgba(255,255,255,0.05);">
+        <a href="index.html"
+          style="display:flex; align-items:center; gap:8px; color:var(--text-muted); font-size:0.85rem;">
+          <span>←</span>
+          <span>Retour au site</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- ===== TAB: Dashboard ===== -->
+      <div id="tab-dashboard" class="tab-content active">
+        <div class="page-header">
+          <div>
+            <h1>Dashboard</h1>
+            <p style="color:var(--text-muted); font-size:0.9rem;">Vue d'ensemble de votre activité PropulsIA</p>
+          </div>
+          <div style="display:flex; gap:12px;">
+            <a href="demo.html" class="btn btn-secondary btn-sm">✨ Mode démo</a>
+            <button class="btn btn-primary btn-sm"
+              onclick="switchTab('images', document.querySelector('[data-tab=images]'))">+ Nouvelle génération</button>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card glass-card">
+            <div class="stat-icon">🖼️</div>
+            <div class="stat-value">127</div>
+            <div class="stat-label">Images générées</div>
+            <div class="stat-change">↑ 12% ce mois</div>
+          </div>
+          <div class="stat-card glass-card">
+            <div class="stat-icon">🎬</div>
+            <div class="stat-value">34</div>
+            <div class="stat-label">Vidéos créées</div>
+            <div class="stat-change">↑ 8% ce mois</div>
+          </div>
+          <div class="stat-card glass-card">
+            <div class="stat-icon">📧</div>
+            <div class="stat-value">89</div>
+            <div class="stat-label">Emails envoyés</div>
+            <div class="stat-change">↑ 23% ce mois</div>
+          </div>
+          <div class="stat-card glass-card">
+            <div class="stat-icon">💾</div>
+            <div class="stat-value">2.4 <span style="font-size:1rem; font-weight:400;">Go</span></div>
+            <div class="stat-label">Stockage utilisé</div>
+            <div class="stat-change" style="color:var(--text-muted);">sur 10 Go</div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="glass-card" style="padding:28px;">
+          <h3 style="margin-bottom:20px;">Activité récente</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Nom</th>
+                <th>Secteur</th>
+                <th>Statut</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>🖼️ Image</td>
+                <td>Restaurant Le Lagon - Façade</td>
+                <td>Restaurant</td>
+                <td><span class="badge badge-success">✓ Terminé</span></td>
+                <td>17 mars 2026</td>
+              </tr>
+              <tr>
+                <td>🎬 Vidéo</td>
+                <td>Clip promo - Hotel Bora Pearl</td>
+                <td>Hôtellerie</td>
+                <td><span class="badge badge-success">✓ Terminé</span></td>
+                <td>16 mars 2026</td>
+              </tr>
+              <tr>
+                <td>📧 Email</td>
+                <td>Campagne Mars - Auto Tahiti</td>
+                <td>Auto-Moto</td>
+                <td><span class="badge badge-warning">⏳ En cours</span></td>
+                <td>16 mars 2026</td>
+              </tr>
+              <tr>
+                <td>🖼️ Image</td>
+                <td>Salon Vahiné Style - Intérieur</td>
+                <td>Coiffure</td>
+                <td><span class="badge badge-success">✓ Terminé</span></td>
+                <td>15 mars 2026</td>
+              </tr>
+              <tr>
+                <td>🖼️ Image</td>
+                <td>Villa Moorea - Extérieur</td>
+                <td>Immobilier</td>
+                <td><span class="badge badge-info">📤 Exporté</span></td>
+                <td>15 mars 2026</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== TAB: Images (Batch Upload) ===== -->
+      <div id="tab-images" class="tab-content" style="display:none;">
+        <div class="page-header">
+          <div>
+            <h1>Génération d'Images</h1>
+            <p style="color:var(--text-muted); font-size:0.9rem;">Importez vos photos et lancez l'amélioration IA</p>
+          </div>
+        </div>
+
+        <!-- Batch Upload Zone -->
+        <div class="glass-card" style="padding:32px; margin-bottom:24px;">
+          <h3 style="margin-bottom:20px;">📸 Import en lot (Batch)</h3>
+          <div class="upload-zone" id="batchUploadZone" style="padding:40px;">
+            <div class="upload-icon">📁</div>
+            <h3>Glissez-déposez vos images</h3>
+            <p>Importez jusqu'à 20 images simultanément • JPG, PNG, WebP</p>
+            <input type="file" id="batchFileInput" accept="image/*" multiple style="display:none;">
+          </div>
+
+          <!-- Batch Preview -->
+          <div id="batchPreview" style="display:none; margin-top:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+              <h4 id="batchCount">0 images sélectionnées</h4>
+              <button class="btn btn-sm btn-secondary" onclick="clearBatch()">Tout supprimer</button>
+            </div>
+            <div id="batchGrid"
+              style="display:grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap:12px;"></div>
+          </div>
+        </div>
+
+        <!-- Batch Options -->
+        <div class="glass-card" style="padding:32px; margin-bottom:24px;">
+          <h3 style="margin-bottom:20px;">⚙️ Options de traitement batch</h3>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px;">
+            <div class="form-group">
+              <label>Secteur</label>
+              <select id="batchSector"
+                style="width:100%; padding:12px; background:var(--bg-dark); border:1px solid var(--border-color); border-radius:var(--radius-md); color:var(--text-primary);">
+                <option value="restaurant">🍽️ Restaurant</option>
+                <option value="immobilier">🏠 Immobilier</option>
+                <option value="auto">🚗 Auto-Moto</option>
+                <option value="hotel">🏨 Hôtellerie</option>
+                <option value="coiffure">💇 Coiffure</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Format</label>
+              <select id="batchFormat"
+                style="width:100%; padding:12px; background:var(--bg-dark); border:1px solid var(--border-color); border-radius:var(--radius-md); color:var(--text-primary);">
+                <option value="2k">2K</option>
+                <option value="4k">4K</option>
+                <option value="original">Original</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Style</label>
+              <select id="batchStyle"
+                style="width:100%; padding:12px; background:var(--bg-dark); border:1px solid var(--border-color); border-radius:var(--radius-md); color:var(--text-primary);">
+                <option value="enhanced">✨ Amélioré</option>
+                <option value="vibrant">🌈 Vibrant</option>
+                <option value="cinematic">🎬 Cinématique</option>
+                <option value="luxury">💎 Luxe</option>
+                <option value="tropical">🌺 Tropical</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:24px; text-align:center;">
+            <button class="btn btn-primary btn-lg" id="batchProcessBtn" onclick="startBatchProcessing()">🚀 Lancer le
+              traitement batch</button>
+          </div>
+        </div>
+
+        <!-- Batch Progress -->
+        <div id="batchProgress" class="glass-card" style="padding:32px; display:none;">
+          <h3 style="margin-bottom:16px;">⏳ Traitement en cours...</h3>
+          <div class="progress-bar" style="margin-bottom:12px;">
+            <div class="progress-bar-fill" id="batchProgressBar" style="width:0%;"></div>
+          </div>
+          <p style="color:var(--text-secondary); font-size:0.9rem;" id="batchProgressText">0 / 0 images traitées</p>
+        </div>
+      </div>
+
+      <!-- ===== TAB: Videos ===== -->
+      <div id="tab-videos" class="tab-content" style="display:none;">
+        <div class="page-header">
+          <div>
+            <h1>Génération de Vidéos</h1>
+            <p style="color:var(--text-muted); font-size:0.9rem;">Créez des clips vidéo promotionnels à partir de vos
+              images</p>
+          </div>
+        </div>
+
+        <div class="glass-card" style="padding:32px;">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:32px;">
+            <!-- Video creation form -->
+            <div>
+              <h3 style="margin-bottom:20px;">🎬 Nouveau clip vidéo</h3>
+              <div class="form-group">
+                <label>Nom du projet</label>
+                <input type="text" placeholder="Ex: Clip Promo Été 2026"
+                  style="width:100%; padding:12px; background:var(--bg-dark); border:1px solid var(--border-color); border-radius:var(--radius-md); color:var(--text-primary);">
+              </div>
+              <div class="form-group">
+                <label>Images source (2-10 images)</label>
+                <div class="upload-zone" style="padding:24px;">
+                  <div class="upload-icon" style="font-size:2rem;">📸</div>
+                  <p style="font-size:0.85rem;">Glissez vos images ici</p>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Durée</label>
+                  <select
+                    style="width:100%; padding:12px; background:var(--bg-dark); border:1px solid var(--border-color); border-radius:var(--radius-md); color:var(--text-primary);">
+                    <option>15 secondes</option>
+                    <option>30 secondes</option>
+                    <option>60 secondes</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Format</label>
+                  <select
+                    style="width:100%; padding:12px; background:var(--bg-dark); border:1px solid var(--border-color); border-radius:var(--radius-md); color:var(--text-primary);">
+                    <option>16:9 (Paysage)</option>
+                    <option>9:16 (Story/Reel)</option>
+                    <option>1:1 (Carré)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Transition</label>
+                <select
+                  style="width:100%; padding:12px; background:var(--bg-dark); border:1px solid var(--border-color); border-radius:var(--radius-md); color:var(--text-primary);">
+                  <option>✨ Fondu élégant</option>
+                  <option>🔄 Slide horizontal</option>
+                  <option>🎬 Ken Burns (zoom lent)</option>
+                  <option>⚡ Cut rapide</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Musique</label>
+                <select
+                  style="width:100%; padding:12px; background:var(--bg-dark); border:1px solid var(--border-color); border-radius:var(--radius-md); color:var(--text-primary);">
+                  <option>🎵 Ambiance tropicale</option>
+                  <option>🎶 Lounge moderne</option>
+                  <option>🎼 Corporate élégant</option>
+                  <option>🔇 Sans musique</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" style="width:100%; margin-top:8px;"
+                onclick="showToast('🎬', 'Génération de la vidéo lancée ! Temps estimé : 2-3 minutes.')">
+                🚀 Générer la vidéo
+              </button>
+            </div>
+
+            <!-- Preview / Tips -->
+            <div>
+              <h3 style="margin-bottom:20px;">📋 Guide de création</h3>
+              <div style="display:flex; flex-direction:column; gap:16px;">
+                <div class="glass-card" style="padding:20px; border-color: rgba(52,211,153,0.2);">
+                  <h4 style="font-size:0.95rem; margin-bottom:8px; color:#34d399;">💡 Conseil</h4>
+                  <p style="color:var(--text-secondary); font-size:0.85rem;">Utilisez 4 à 6 images de haute qualité pour
+                    un clip de 15 secondes. Variez les angles pour un rendu dynamique.</p>
+                </div>
+                <div class="glass-card" style="padding:20px; border-color: rgba(14,165,233,0.2);">
+                  <h4 style="font-size:0.95rem; margin-bottom:8px; color:var(--primary-light);">📐 Formats recommandés
+                  </h4>
+                  <p style="color:var(--text-secondary); font-size:0.85rem;"><strong>Instagram/TikTok :</strong> 9:16
+                    (vertical)<br><strong>Facebook/YouTube :</strong> 16:9 (horizontal)<br><strong>Post standard
+                      :</strong> 1:1 (carré)</p>
+                </div>
+                <div class="glass-card" style="padding:20px; border-color: rgba(168,85,247,0.2);">
+                  <h4 style="font-size:0.95rem; margin-bottom:8px; color:var(--neon-purple);">🎵 À propos de la musique
+                  </h4>
+                  <p style="color:var(--text-secondary); font-size:0.85rem;">Nos musiques sont libres de droits et
+                    utilisables commercialement. Parfait pour les réseaux sociaux et publicités.</p>
+                </div>
+                <div class="glass-card" style="padding:20px; border-color: rgba(251,191,36,0.2);">
+                  <h4 style="font-size:0.95rem; margin-bottom:8px; color:#fbbf24;">⚡ Performance</h4>
+                  <p style="color:var(--text-secondary); font-size:0.85rem;">Temps de génération moyen : 2-3 min pour un
+                    clip de 15s. Les vidéos 60s peuvent prendre jusqu'à 8 min.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB: Emails ===== -->
+      <div id="tab-emails" class="tab-content" style="display:none;">
+        <div class="page-header">
+          <div>
+            <h1>Emails & DM Automatisés</h1>
+            <p style="color:var(--text-muted); font-size:0.9rem;">Générez et envoyez des campagnes personnalisées par IA
+            </p>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px;">
+          <!-- Email Composer -->
+          <div class="glass-card" style="padding:32px;">
+            <h3 style="margin-bottom:20px;">✉️ Composer une campagne</h3>
+            <div class="form-group">
+              <label>Type de campagne</label>
+              <select
+                style="width:100%; padding:12px; background:var(--bg-dark); border:1px solid var(--border-color); border-radius:var(--radius-md); color:var(--text-primary);">
+                <option>📧 Email marketing</option>
+                <option>💬 DM Instagram</option>
+                <option>📘 Message Facebook</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Secteur cible</label>
+              <select
+                style="width:100%; padding:12px; background:var(--bg-dark); border:1px solid var(--border-color); border-radius:var(--radius-md); color:var(--text-primary);">
+                <option>🍽️ Restaurants</option>
+                <option>🏠 Immobilier</option>
+                <option>🚗 Auto-Moto</option>
+                <option>🏨 Hôtellerie</option>
+                <option>💇 Coiffure</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Ton du message</label>
+              <select
+                style="width:100%; padding:12px; background:var(--bg-dark); border:1px solid var(--border-color); border-radius:var(--radius-md); color:var(--text-primary);">
+                <option>🤝 Professionnel</option>
+                <option>😊 Amical</option>
+                <option>🎯 Direct & concis</option>
+                <option>✨ Premium / Luxe</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Contexte / Message personnalisé (optionnel)</label>
+              <textarea
+                placeholder="Ex: Nous avons analysé votre page Google et avons des suggestions pour améliorer vos photos..."
+                style="width:100%; padding:12px; background:var(--bg-dark); border:1px solid var(--border-color); border-radius:var(--radius-md); color:var(--text-primary); min-height:100px; resize:vertical;"></textarea>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="generateEmailPreview()">
+              🤖 Générer avec l'IA
+            </button>
+          </div>
+
+          <!-- Email Preview -->
+          <div class="glass-card" style="padding:32px;">
+            <h3 style="margin-bottom:20px;">👁️ Aperçu</h3>
+            <div id="emailPreview"
+              style="background:var(--bg-dark); border-radius:var(--radius-md); padding:24px; min-height:300px; border:1px solid var(--border-color);">
+              <div style="text-align:center; padding:60px 20px; color:var(--text-muted);">
+                <div style="font-size:3rem; margin-bottom:12px;">✉️</div>
+                <p>Cliquez sur "Générer avec l'IA" pour voir l'aperçu de votre message ici.</p>
+              </div>
+            </div>
+            <div style="display:flex; gap:12px; margin-top:16px;">
+              <button class="btn btn-secondary btn-sm" style="flex:1;"
+                onclick="showToast('📋', 'Message copié dans le presse-papier !')">📋 Copier</button>
+              <button class="btn btn-primary btn-sm" style="flex:1;"
+                onclick="showToast('📧', 'Envoi programmé ! 12 destinataires.')">📤 Envoyer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB: History ===== -->
+      <div id="tab-history" class="tab-content" style="display:none;">
+        <div class="page-header">
+          <div>
+            <h1>Historique</h1>
+            <p style="color:var(--text-muted); font-size:0.9rem;">Retrouvez toutes vos générations et campagnes passées
+            </p>
+          </div>
+          <div style="display:flex; gap:12px;">
+            <select
+              style="padding:10px 16px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); color:var(--text-primary); font-size:0.85rem;">
+              <option>Tous les types</option>
+              <option>🖼️ Images</option>
+              <option>🎬 Vidéos</option>
+              <option>📧 Emails</option>
+            </select>
+            <select
+              style="padding:10px 16px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); color:var(--text-primary); font-size:0.85rem;">
+              <option>Ce mois</option>
+              <option>Cette semaine</option>
+              <option>Tout</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="glass-card" style="padding:28px;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Nom</th>
+                <th>Secteur</th>
+                <th>Format</th>
+                <th>Statut</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>🖼️</td>
+                <td>Restaurant Le Lagon - Façade</td>
+                <td>Restaurant</td>
+                <td>4K</td>
+                <td><span class="badge badge-success">✓ Terminé</span></td>
+                <td>17/03/2026</td>
+                <td><button class="btn btn-sm btn-secondary" style="padding:6px 12px; font-size:0.75rem;">⬇️</button>
+                </td>
+              </tr>
+              <tr>
+                <td>🖼️</td>
+                <td>Restaurant Le Lagon - Salle</td>
+                <td>Restaurant</td>
+                <td>4K</td>
+                <td><span class="badge badge-success">✓ Terminé</span></td>
+                <td>17/03/2026</td>
+                <td><button class="btn btn-sm btn-secondary" style="padding:6px 12px; font-size:0.75rem;">⬇️</button>
+                </td>
+              </tr>
+              <tr>
+                <td>🎬</td>
+                <td>Clip promo - Hotel Bora Pearl</td>
+                <td>Hôtellerie</td>
+                <td>16:9</td>
+                <td><span class="badge badge-success">✓ Terminé</span></td>
+                <td>16/03/2026</td>
+                <td><button class="btn btn-sm btn-secondary" style="padding:6px 12px; font-size:0.75rem;">⬇️</button>
+                </td>
+              </tr>
+              <tr>
+                <td>📧</td>
+                <td>Campagne Mars - Auto Tahiti</td>
+                <td>Auto-Moto</td>
+                <td>—</td>
+                <td><span class="badge badge-warning">⏳ En cours</span></td>
+                <td>16/03/2026</td>
+                <td><button class="btn btn-sm btn-secondary" style="padding:6px 12px; font-size:0.75rem;">👁️</button>
+                </td>
+              </tr>
+              <tr>
+                <td>🖼️</td>
+                <td>Lot 5 images - Villa Moorea</td>
+                <td>Immobilier</td>
+                <td>2K</td>
+                <td><span class="badge badge-info">📤 Exporté</span></td>
+                <td>15/03/2026</td>
+                <td><button class="btn btn-sm btn-secondary" style="padding:6px 12px; font-size:0.75rem;">⬇️</button>
+                </td>
+              </tr>
+              <tr>
+                <td>🖼️</td>
+                <td>Salon Vahiné Style - Intérieur</td>
+                <td>Coiffure</td>
+                <td>4K</td>
+                <td><span class="badge badge-success">✓ Terminé</span></td>
+                <td>15/03/2026</td>
+                <td><button class="btn btn-sm btn-secondary" style="padding:6px 12px; font-size:0.75rem;">⬇️</button>
+                </td>
+              </tr>
+              <tr>
+                <td>🎬</td>
+                <td>Visite virtuelle - Fare Mahana</td>
+                <td>Hôtellerie</td>
+                <td>9:16</td>
+                <td><span class="badge badge-success">✓ Terminé</span></td>
+                <td>14/03/2026</td>
+                <td><button class="btn btn-sm btn-secondary" style="padding:6px 12px; font-size:0.75rem;">⬇️</button>
+                </td>
+              </tr>
+              <tr>
+                <td>📧</td>
+                <td>Prospection - Restaurants Papeete</td>
+                <td>Restaurant</td>
+                <td>—</td>
+                <td><span class="badge badge-success">✓ Envoyé</span></td>
+                <td>13/03/2026</td>
+                <td><button class="btn btn-sm btn-secondary" style="padding:6px 12px; font-size:0.75rem;">👁️</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <span id="toastIcon">✅</span>
+    <span id="toastMessage"></span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/production.js"></script>
+</body>
+
+</html>

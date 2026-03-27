@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Démo interactive PropulsIA — Testez notre IA en temps réel. Uploadez une photo et voyez la transformation instantanée.">
+  <title>Démo Interactive — PropulsIA</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header scrolled" id="header">
+    <div class="container">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">⚡</div>
+        <span>PropulsIA</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Accueil</a>
+        <a href="index.html#services">Services</a>
+        <a href="production.html">Production</a>
+        <a href="booking.html">Planifier RDV</a>
+      </nav>
+      <div class="nav-cta">
+        <a href="login.html" class="btn btn-secondary btn-sm">Connexion</a>
+        <a href="index.html#pricing" class="btn btn-primary btn-sm">Voir les tarifs</a>
+      </div>
+      <div class="mobile-menu-btn" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-close" onclick="toggleMobileMenu()">✕</div>
+    <a href="index.html" onclick="toggleMobileMenu()">Accueil</a>
+    <a href="production.html">Production</a>
+    <a href="booking.html">Planifier RDV</a>
+    <a href="login.html" class="btn btn-secondary">Connexion</a>
+  </div>
+
+  <!-- ===== DEMO PAGE ===== -->
+  <main style="padding-top: 100px; min-height: 100vh;">
+    <div class="container">
+
+      <!-- Page Title -->
+      <div style="text-align:center; margin-bottom:48px;">
+        <h1 class="section-title" style="margin-bottom:12px;">Démo Avant-Vente</h1>
+        <p style="color: var(--text-secondary); font-size:1.1rem; max-width:600px; margin:0 auto;">
+          Importez la photo de votre client, sélectionnez son secteur et lancez l'analyse IA en temps réel.
+        </p>
+      </div>
+
+      <!-- Step 1 : Sector Selection -->
+      <div id="step1" class="demo-step">
+        <h2 style="font-size:1.3rem; margin-bottom:24px; display:flex; align-items:center; gap:12px;">
+          <span
+            style="width:36px; height:36px; background:var(--gradient-primary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.9rem; font-weight:700; color:#050506;">1</span>
+          Sélectionnez le secteur d'activité
+        </h2>
+        <div class="sectors-grid" style="margin-top:0;" id="sectorGrid">
+          <div class="sector-card glass-card" data-sector="restaurant" onclick="selectSector(this)">
+            <span class="sector-icon">🍽️</span>
+            <h4>Restaurant</h4>
+          </div>
+          <div class="sector-card glass-card" data-sector="immobilier" onclick="selectSector(this)">
+            <span class="sector-icon">🏠</span>
+            <h4>Immobilier</h4>
+          </div>
+          <div class="sector-card glass-card" data-sector="auto" onclick="selectSector(this)">
+            <span class="sector-icon">🚗</span>
+            <h4>Auto-Moto</h4>
+          </div>
+          <div class="sector-card glass-card" data-sector="hotel" onclick="selectSector(this)">
+            <span class="sector-icon">🏨</span>
+            <h4>Hôtellerie</h4>
+          </div>
+          <div class="sector-card glass-card" data-sector="coiffure" onclick="selectSector(this)">
+            <span class="sector-icon">💇</span>
+            <h4>Coiffure</h4>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 : Image Upload -->
+      <div id="step2" class="demo-step"
+        style="margin-top:48px; opacity:0.4; pointer-events:none; transition: all 0.5s ease;">
+        <h2 style="font-size:1.3rem; margin-bottom:24px; display:flex; align-items:center; gap:12px;">
+          <span
+            style="width:36px; height:36px; background: var(--gradient-accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.9rem; font-weight:700; color:#050506;">2</span>
+          Importez la photo du client
+        </h2>
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+          <div class="upload-icon">📸</div>
+          <h3>Glissez-déposez votre image ici</h3>
+          <p>ou cliquez pour parcourir • JPG, PNG, WebP — max 10 Mo</p>
+          <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
+        </div>
+        <!-- Preview -->
+        <div id="uploadPreview" style="display:none; margin-top:24px; text-align:center;">
+          <div class="glass-card" style="padding:16px; display:inline-block; position:relative;">
+            <img id="previewImg" src="" alt="Preview" style="max-height:300px; border-radius: var(--radius-md);">
+            <button onclick="removeImage()"
+              style="position:absolute; top:8px; right:8px; width:32px; height:32px; background:rgba(248,113,113,0.9); border-radius:50%; cursor:pointer; color:white; font-size:1rem; display:flex; align-items:center; justify-content:center;">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 : Options & Generate -->
+      <div id="step3" class="demo-step"
+        style="margin-top:48px; opacity:0.4; pointer-events:none; transition: all 0.5s ease;">
+        <h2 style="font-size:1.3rem; margin-bottom:24px; display:flex; align-items:center; gap:12px;">
+          <span
+            style="width:36px; height:36px; background: var(--gradient-primary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.9rem; font-weight:700; color:#050506;">3</span>
+          Options de rendu
+        </h2>
+        <div class="glass-card" style="padding:32px;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:24px;">
+            <!-- Format -->
+            <div class="form-group">
+              <label>Format de sortie</label>
+              <select id="outputFormat"
+                style="width:100%; padding:12px; background:var(--bg-dark); border:1px solid var(--border-color); border-radius:var(--radius-md); color:var(--text-primary);">
+                <option value="2k">2K (2048 × 1536)</option>
+                <option value="4k">4K (4096 × 3072)</option>
+                <option value="original">Format original</option>
+              </select>
+            </div>
+            <!-- Style -->
+            <div class="form-group">
+              <label>Style artistique</label>
+              <select id="outputStyle"
+                style="width:100%; padding:12px; background:var(--bg-dark); border:1px solid var(--border-color); border-radius:var(--radius-md); color:var(--text-primary);">
+                <option value="enhanced">✨ Amélioré (par défaut)</option>
+                <option value="vibrant">🌈 Vibrant</option>
+                <option value="cinematic">🎬 Cinématique</option>
+                <option value="luxury">💎 Luxe</option>
+                <option value="tropical">🌺 Tropical Polynésien</option>
+              </select>
+            </div>
+            <!-- Enhancement — styled check cards -->
+            <div class="form-group">
+              <label style="margin-bottom:12px; display:block;">Améliorations</label>
+              <div class="check-grid" id="enhancementChecks">
+
+                <label class="check-option checked" onclick="toggleCheckOption(this)" id="optBrightness">
+                  <input type="checkbox" id="enhBrightness" class="propulsia-check" checked>
+                  <span class="check-box"></span>
+                  <span class="check-label">
+                    <strong>Luminosité optimisée</strong>
+                    <span>Éclairage naturel et équilibré</span>
+                  </span>
+                </label>
+
+                <label class="check-option checked" onclick="toggleCheckOption(this)" id="optContrast">
+                  <input type="checkbox" id="enhContrast" class="propulsia-check" checked>
+                  <span class="check-box"></span>
+                  <span class="check-label">
+                    <strong>Contraste amélioré</strong>
+                    <span>Profondeur et relief accentués</span>
+                  </span>
+                </label>
+
+                <label class="check-option checked" onclick="toggleCheckOption(this)" id="optSaturation">
+                  <input type="checkbox" id="enhSaturation" class="propulsia-check" checked>
+                  <span class="check-box"></span>
+                  <span class="check-label">
+                    <strong>Couleurs vivantes</strong>
+                    <span>Saturation et vibrance boostées</span>
+                  </span>
+                </label>
+
+                <label class="check-option" onclick="toggleCheckOption(this)" id="optSharpness">
+                  <input type="checkbox" id="enhSharpness" class="propulsia-check">
+                  <span class="check-box"></span>
+                  <span class="check-label">
+                    <strong>Netteté renforcée</strong>
+                    <span>Détails nets et précis</span>
+                  </span>
+                </label>
+
+              </div>
+            </div>
+          </div>
+          <div style="text-align:center; margin-top:32px;">
+            <button class="btn btn-primary btn-lg" id="generateBtn" onclick="startAnalysis()">
+              🚀 Lancer l'analyse IA
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 : Analysis + Result -->
+      <div id="step4" class="demo-step" style="margin-top:48px; display:none;">
+
+        <!-- Scanning overlay -->
+        <div id="scanningState" style="display:none;">
+          <div class="glass-card" style="padding:48px; text-align:center;">
+            <div style="font-size:3rem; margin-bottom:16px;" id="scanEmoji">🔍</div>
+            <h3 style="margin-bottom:12px;" id="scanTitle">Analyse IA en cours...</h3>
+            <p style="color:var(--text-secondary); margin-bottom:24px;" id="scanDesc">Notre IA analyse votre image pour
+              le secteur sélectionné</p>
+            <div class="progress-bar" style="max-width:400px; margin:0 auto;">
+              <div class="progress-bar-fill" id="scanProgress" style="width:0%;"></div>
+            </div>
+            <div style="margin-top:12px; font-size:0.85rem; color:var(--text-muted);" id="scanPercent">0%</div>
+          </div>
+        </div>
+
+        <!-- Result: Before / After -->
+        <div id="resultState" style="display:none;">
+          <h2 style="font-size:1.3rem; margin-bottom:24px; display:flex; align-items:center; gap:12px;">
+            <span
+              style="width:36px; height:36px; background: var(--gradient-primary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.9rem; font-weight:700; color:#050506;">4</span>
+            Résultat — Avant / Après
+          </h2>
+
+          <!-- Before/After Slider -->
+          <div class="ba-slider glass-card" id="baSlider"
+            style="max-width:800px; margin:0 auto; padding:0; aspect-ratio:16/10; position:relative;">
+            <img id="afterImage" src="" alt="Après IA"
+              style="width:100%; height:100%; object-fit:cover; display:block;">
+            <div class="ba-before" id="baBefore">
+              <img id="beforeImage" src="" alt="Avant" style="width:auto; min-width:100%;">
+            </div>
+            <div class="ba-handle" id="baHandle"></div>
+            <span class="ba-label before">AVANT</span>
+            <span class="ba-label after">APRÈS IA ⚡</span>
+            <!-- Scan overlay -->
+            <div class="scan-overlay" id="scanOverlay">
+              <div class="scan-line"></div>
+              <div class="scan-grid"></div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div style="display:flex; justify-content:center; gap:12px; margin-top:28px; flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="downloadResult()">⬇️ Télécharger</button>
+            <button class="btn btn-secondary" onclick="saveToGallery()">💾 Sauvegarder</button>
+            <button class="btn btn-secondary" id="generateVideoBtn" onclick="generateVideoDemo()">🎥 Créer une
+              mini-vidéo</button>
+            <button class="btn btn-secondary" onclick="shareResult()">🔗 Partager</button>
+            <button class="btn btn-secondary" onclick="resetDemo()">🔄 Nouvelle analyse</button>
+            <a href="booking.html" class="btn btn-accent">📅 Planifier un RDV</a>
+          </div>
+
+          <!-- Info strip -->
+          <div class="glass-card"
+            style="padding:20px 28px; margin-top:24px; max-width:800px; margin-left:auto; margin-right:auto;">
+            <div style="display:flex; justify-content:space-around; flex-wrap:wrap; gap:16px; text-align:center;">
+              <div>
+                <div style="font-size:1.5rem; font-weight:700; color:var(--primary);" id="infoSector">—</div>
+                <div style="font-size:0.8rem; color:var(--text-muted);">Secteur</div>
+              </div>
+              <div>
+                <div style="font-size:1.5rem; font-weight:700; color:var(--primary-light);" id="infoFormat">—</div>
+                <div style="font-size:0.8rem; color:var(--text-muted);">Format</div>
+              </div>
+              <div>
+                <div style="font-size:1.5rem; font-weight:700; color:var(--accent-light);" id="infoStyle">—</div>
+                <div style="font-size:0.8rem; color:var(--text-muted);">Style</div>
+              </div>
+              <div>
+                <div style="font-size:1.5rem; font-weight:700; color:#AAFF00;" id="infoTime">—</div>
+                <div style="font-size:0.8rem; color:var(--text-muted);">Temps d'analyse</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5 : Video Result -->
+      <div id="step5" class="demo-step" style="margin-top:48px; display:none;">
+        <h2 style="font-size:1.3rem; margin-bottom:24px; display:flex; align-items:center; gap:12px;">
+          <span
+            style="width:36px; height:36px; background: var(--gradient-primary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.9rem; font-weight:700; color:#050506;">5</span>
+          Mini-vidéo IA
+        </h2>
+
+        <div id="videoScanningState" style="display:none; margin-bottom: 24px;">
+          <div class="glass-card" style="padding:48px; text-align:center;">
+            <div style="font-size:3rem; margin-bottom:16px;">🎥</div>
+            <h3 style="margin-bottom:12px;" id="videoScanTitle">Génération du second angle...</h3>
+            <p style="color:var(--text-secondary); margin-bottom:24px;">L'IA crée un nouveau point de vue pour le
+              mouvement de caméra</p>
+            <div class="progress-bar" style="max-width:400px; margin:0 auto;">
+              <div class="progress-bar-fill" id="videoScanProgress" style="width:10%;"></div>
+            </div>
+            <div style="margin-top:12px; font-size:0.85rem; color:var(--text-muted);" id="videoScanPercent">10%</div>
+          </div>
+        </div>
+
+        <div id="videoResultState" style="display:none;">
+          <div class="glass-card" style="max-width:800px; margin:0 auto; padding:0; overflow:hidden;">
+            <div class="video-mock-player">
+              <div class="video-container" id="videoContainer">
+                <img id="videoImg1" src="" class="video-frame frame-1" alt="Frame 1">
+                <img id="videoImg2" src="" class="video-frame frame-2" alt="Frame 2">
+              </div>
+              <div class="video-controls">
+                <button class="btn btn-sm btn-primary" onclick="replayVideo()">▶️ Rejouer l'animation</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" style="margin-top:80px;">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:none; padding-top:0;">
+        <span>© 2026 PropulsIA — propulsia.io. Tous droits réservés.</span>
+        <a href="index.html" style="color:var(--primary);">← Retour à l'accueil</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <span id="toastIcon">✅</span>
+    <span id="toastMessage"></span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/demo.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Choisissez votre abonnement PropulsIA — Découverte, Professionnel ou Entreprise.">
+  <title>Abonnements — PropulsIA</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="header scrolled" id="header">
+    <div class="container">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">⚡</div>
+        <span>PropulsIA</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Accueil</a>
+        <a href="demo.html">Démo</a>
+        <a href="index.html#services">Services</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
+      <div class="nav-cta">
+        <a href="login.html" class="btn btn-secondary btn-sm">Connexion</a>
+      </div>
+      <div class="mobile-menu-btn" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-close" onclick="toggleMobileMenu()">✕</div>
+    <a href="index.html">Accueil</a>
+    <a href="demo.html">Démo</a>
+    <a href="login.html" class="btn btn-secondary">Connexion</a>
+  </div>
+
+  <!-- Main -->
+  <main style="padding-top:100px; min-height:100vh;">
+    <div class="container">
+      <div style="text-align:center; margin-bottom:48px;">
+        <h1 class="section-title" style="margin-bottom:12px;">Choisissez votre plan</h1>
+        <p style="color:var(--text-secondary); font-size:1.1rem; max-width:600px; margin:0 auto;">
+          Des formules flexibles adaptées à chaque besoin. Commencez gratuitement et évoluez selon vos besoins.
+        </p>
+      </div>
+
+      <!-- Billing Toggle -->
+      <div style="display:flex; justify-content:center; margin-bottom:48px;">
+        <div
+          style="display:flex; background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-full); padding:4px;">
+          <button class="billing-toggle active" id="billingMonthly" onclick="toggleBilling('monthly')"
+            style="padding:10px 24px; border-radius:var(--radius-full); cursor:pointer; font-size:0.85rem; font-weight:500; transition:all 0.3s ease; background:var(--gradient-primary); color:white;">
+            Mensuel
+          </button>
+          <button class="billing-toggle" id="billingAnnual" onclick="toggleBilling('annual')"
+            style="padding:10px 24px; border-radius:var(--radius-full); cursor:pointer; font-size:0.85rem; font-weight:500; transition:all 0.3s ease; color:var(--text-muted); background:transparent;">
+            Annuel <span style="color:#34d399; font-size:0.75rem;">-20%</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Pricing Cards -->
+      <div class="pricing-grid" style="max-width:1100px; margin:0 auto;" class="subscribe-grid">
+
+        <!-- Découverte -->
+        <div class="pricing-card glass-card">
+          <div class="pricing-name">Découverte</div>
+          <div class="pricing-price" id="priceDiscover">Gratuit</div>
+          <div class="pricing-desc">Par tâche — Idéal pour tester</div>
+          <ul class="pricing-features">
+            <li><span class="check">✓</span> 3 générations d'images / mois</li>
+            <li><span class="check">✓</span> Comparateur Avant / Après</li>
+            <li><span class="check">✓</span> Format 2K</li>
+            <li><span class="check">✓</span> 1 secteur d'activité</li>
+            <li><span class="check">✓</span> Sauvegarde 7 jours</li>
+            <li style="color:var(--primary); font-size:0.85rem;"><span class="check">⚡</span> Logo PropulsIA en
+              filigrane</li>
+            <li class="disabled"><span class="check">✗</span> Génération de vidéos</li>
+            <li class="disabled"><span class="check">✗</span> Campagnes email</li>
+            <li class="disabled"><span class="check">✗</span> Batch processing</li>
+            <li class="disabled"><span class="check">✗</span> Support prioritaire</li>
+          </ul>
+          <button class="btn btn-secondary" style="width:100%;" onclick="selectPlan('discover')">
+            Commencer gratuitement
+          </button>
+        </div>
+
+        <!-- Pro -->
+        <div class="pricing-card glass-card featured">
+          <div class="pricing-badge">⭐ Populaire</div>
+          <div class="pricing-name">Professionnel</div>
+          <div class="pricing-price" id="pricePro">29 900 <span>XPF/mois</span></div>
+          <div class="pricing-desc">Accès complet — Pour les commerces actifs</div>
+          <ul class="pricing-features">
+            <li><span class="check">✓</span> Images illimitées</li>
+            <li><span class="check">✓</span> Formats 2K & 4K</li>
+            <li><span class="check">✓</span> Tous les 5 secteurs</li>
+            <li><span class="check">✓</span> 10 vidéos / mois</li>
+            <li><span class="check">✓</span> 100 emails / mois</li>
+            <li><span class="check">✓</span> Batch processing</li>
+            <li><span class="check">✓</span> Sauvegarde illimitée</li>
+            <li><span class="check">✓</span> Support prioritaire</li>
+            <li><span class="check">✓</span> Dashboard production</li>
+          </ul>
+          <button class="btn btn-primary" style="width:100%;" onclick="selectPlan('pro')">
+            Choisir le plan Pro
+          </button>
+        </div>
+
+        <!-- Entreprise -->
+        <div class="pricing-card glass-card">
+          <div class="pricing-name">Entreprise</div>
+          <div class="pricing-price" id="priceEnterprise">Sur mesure</div>
+          <div class="pricing-desc">Pour les agences et grands comptes</div>
+          <ul class="pricing-features">
+            <li><span class="check">✓</span> Tout le plan Pro inclus</li>
+            <li><span class="check">✓</span> Vidéos illimitées</li>
+            <li><span class="check">✓</span> Emails illimités</li>
+            <li><span class="check">✓</span> API personnalisée</li>
+            <li><span class="check">✓</span> Marque blanche</li>
+            <li><span class="check">✓</span> Onboarding dédié</li>
+            <li><span class="check">✓</span> Manager de compte</li>
+            <li><span class="check">✓</span> SLA garanti</li>
+            <li><span class="check">✓</span> Multi-utilisateurs</li>
+          </ul>
+          <a href="booking.html" class="btn btn-accent" style="width:100%;">
+            Nous contacter
+          </a>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div style="max-width:700px; margin:80px auto 0;">
+        <h2 class="section-title" style="margin-bottom:32px;">Questions fréquentes</h2>
+
+        <div class="glass-card" style="margin-bottom:12px;">
+          <div
+            style="padding:20px 24px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;"
+            onclick="toggleFaq(this)">
+            <strong style="font-size:0.95rem;">Puis-je changer de plan à tout moment ?</strong>
+            <span style="color:var(--text-muted); transition:transform 0.3s ease;">▼</span>
+          </div>
+          <div style="padding:0 24px 20px; display:none; color:var(--text-secondary); font-size:0.9rem;">
+            Oui, vous pouvez upgrader ou downgrader votre plan à tout moment. Le changement prend effet immédiatement et
+            le prorata est calculé automatiquement.
+          </div>
+        </div>
+
+        <div class="glass-card" style="margin-bottom:12px;">
+          <div
+            style="padding:20px 24px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;"
+            onclick="toggleFaq(this)">
+            <strong style="font-size:0.95rem;">Comment fonctionne le plan gratuit ?</strong>
+            <span style="color:var(--text-muted); transition:transform 0.3s ease;">▼</span>
+          </div>
+          <div style="padding:0 24px 20px; display:none; color:var(--text-secondary); font-size:0.9rem;">
+            Le plan Découverte vous donne accès à 3 améliorations d'images par mois, au format 2K. C'est idéal pour
+            tester notre technologie avant de vous engager.
+          </div>
+        </div>
+
+        <div class="glass-card" style="margin-bottom:12px;">
+          <div
+            style="padding:20px 24px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;"
+            onclick="toggleFaq(this)">
+            <strong style="font-size:0.95rem;">Les prix incluent-ils les taxes ?</strong>
+            <span style="color:var(--text-muted); transition:transform 0.3s ease;">▼</span>
+          </div>
+          <div style="padding:0 24px 20px; display:none; color:var(--text-secondary); font-size:0.9rem;">
+            Tous les prix affichés sont en XPF et TTC. Aucun frais caché — ce que vous voyez est ce que vous payez.
+          </div>
+        </div>
+
+        <div class="glass-card" style="margin-bottom:12px;">
+          <div
+            style="padding:20px 24px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;"
+            onclick="toggleFaq(this)">
+            <strong style="font-size:0.95rem;">Proposez-vous un essai gratuit du plan Pro ?</strong>
+            <span style="color:var(--text-muted); transition:transform 0.3s ease;">▼</span>
+          </div>
+          <div style="padding:0 24px 20px; display:none; color:var(--text-secondary); font-size:0.9rem;">
+            Absolument ! Contactez-nous pour un RDV de démonstration et nous vous offrirons 7 jours d'essai gratuit du
+            plan Pro.
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Subscription Modal -->
+  <div class="modal-overlay" id="subModal">
+    <div class="modal glass-card" style="max-width:450px;">
+      <div style="text-align:center; margin-bottom:24px;">
+        <div style="font-size:3rem; margin-bottom:12px;" id="subModalIcon">⭐</div>
+        <h3 id="subModalTitle">Abonnement Professionnel</h3>
+        <p id="subModalDesc">Finalisez votre inscription pour accéder à tous nos outils.</p>
+      </div>
+      <form onsubmit="processSubscription(event)">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="votre@email.pf" required id="subEmail">
+        </div>
+        <div class="form-group">
+          <label>Nom complet</label>
+          <input type="text" placeholder="Votre nom" required>
+        </div>
+        <div class="form-group">
+          <label>Numéro de carte (simulé)</label>
+          <input type="text" placeholder="XXXX XXXX XXXX XXXX" maxlength="19" id="subCard">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Expiration</label>
+            <input type="text" placeholder="MM/AA" maxlength="5">
+          </div>
+          <div class="form-group">
+            <label>CVV</label>
+            <input type="text" placeholder="123" maxlength="3">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">💳 Confirmer l'abonnement</button>
+        <button type="button" class="btn btn-secondary" style="width:100%; margin-top:8px;"
+          onclick="document.getElementById('subModal').classList.remove('active')">Annuler</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer" style="margin-top:80px;">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:none; padding-top:0;">
+        <span>© 2026 PropulsIA — propulsia.io. Tous droits réservés.</span>
+        <a href="index.html" style="color:var(--primary);">← Retour à l'accueil</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast">
+    <span id="toastIcon">✅</span>
+    <span id="toastMessage"></span>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+
+</html>
