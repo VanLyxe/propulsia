@@ -77,6 +77,8 @@ serve(async (req) => {
         user_id: userId || null,
         generated_url: urlData.publicUrl,
         generated_path: filePath,
+        original_url: metadata?.originalUrl || imageUrl,
+        original_path: '',
         sector: metadata?.sector,
         style: metadata?.style,
         format: metadata?.format,

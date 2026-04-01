@@ -1,12 +1,14 @@
 // ===========================
 // PROPULSIA - Storage Module (Supabase)
+// Sauvegarde via Edge Function (Contourne CORS et stocke le fichier dans Storage)
 // ===========================
 
 const StorageService = {
+
   // Helper pour récupérer l'utilisateur courant
   async getCurrentUser() {
-    const supabaseClient = window.supabase;
-    if (!supabaseClient) return null;
+    const supabaseClient = window.supabaseClient || window.supabase;
+    if (!supabaseClient || !supabaseClient.auth) return null;
     
     try {
       const { data: { user } } = await supabaseClient.auth.getUser();
@@ -17,52 +19,67 @@ const StorageService = {
     }
   },
 
-  // Sauvegarder UNIQUEMENT l'image générée par KIE via Edge Function
+  // Récupérer le client Supabase initialisé
+  getClient() {
+    const client = window.supabaseClient || window.supabase;
+    if (!client || typeof client.functions === 'undefined') {
+      throw new Error('Supabase client non initialisé correctement.');
+    }
+    return client;
+  },
+
+  // Sauvegarder l'image générée en appelant l'Edge Function Supabase
   async saveGeneratedImage(generatedImageUrl, metadata) {
-    console.log("=== DÉBUT SAUVEGARDE IMAGE GÉNÉRÉE ===");
-    console.log("URL image générée:", generatedImageUrl);
+    console.log("=== SAUVEGARDE VIA EDGE FUNCTION ===");
+    console.log("URL de l'image à télécharger:", generatedImageUrl);
     
     try {
-      const supabaseClient = window.supabase;
-      if (!supabaseClient) {
-        throw new Error('Supabase client not initialized');
-      }
-
+      const supabaseClient = this.getClient();
       const user = await this.getCurrentUser();
       
-      if (!generatedImageUrl) {
-        throw new Error("NO GENERATED IMAGE URL");
-      }
+      const beforeImg = document.getElementById('beforeImage');
+      const originalUrl = beforeImg ? beforeImg.src : '';
 
-      // Appeler l'Edge Function pour télécharger et stocker l'image
-      console.log("STEP 1: CALLING EDGE FUNCTION");
-      
+      // Appel de l'Edge Function 'download-and-store' qui tourne sur les serveurs Supabase
+      // Elle télécharge l'image générée sans problème de CORS et la met dans le bucket !
       const { data, error } = await supabaseClient.functions.invoke('download-and-store', {
         body: {
           imageUrl: generatedImageUrl,
-          userId: user?.id,
-          metadata: metadata
+          userId: user?.id || null,
+          metadata: {
+            ...metadata,
+            originalUrl: originalUrl
+          }
         }
       });
 
       if (error) {
-        throw new Error("EDGE FUNCTION ERROR: " + error.message);
+        throw new Error('Erreur exécution Edge Function: ' + error.message);
       }
 
       if (!data || !data.success) {
-        throw new Error(data?.error || "Unknown error from edge function");
+        throw new Error(data?.error || 'Erreur inconnue renvoyée par la fonction');
       }
 
-      console.log("STEP 2: UPLOAD SUCCESS", data.url);
-      console.log("=== FIN SAUVEGARDE ===");
+      console.log("✅ Sauvegarde dans le Storage réussie:", data);
+      showToast('💾', 'Fichier image sauvegardé dans Supabase !');
       
-      showToast('💾', 'Image sauvegardée dans votre galerie !');
-      return data.data;
-      
+      return data;
+
     } catch (error) {
-      console.error('Erreur sauvegarde:', error);
-      showToast('⚠️', 'Erreur: ' + error.message);
+      console.error('❌ Erreur sauvegarde:', error);
+      showToast('⚠️', 'Erreur sauvegarde: ' + error.message);
       throw error;
+    }
+  },
+
+  // Sauvegarde automatique (non-bloquante)
+  async autoSave(generatedImageUrl, metadata) {
+    try {
+      return await this.saveGeneratedImage(generatedImageUrl, metadata);
+    } catch (error) {
+      console.warn('Auto-save échoué:', error.message);
+      return null;
     }
   }
 };

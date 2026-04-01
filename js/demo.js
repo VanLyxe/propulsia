@@ -284,6 +284,24 @@ function showResult(generatedImageUrl, durationInSeconds) {
   const overlay = document.getElementById('scanOverlay');
   overlay.classList.add('active');
   setTimeout(() => overlay.classList.remove('active'), 2500);
+
+  // 🔥 Sauvegarde automatique vers Supabase en arrière-plan
+  const metadata = {
+    sector: selectedSector,
+    style: getStyleLabel(),
+    format: document.getElementById('outputFormat')?.value?.toUpperCase() || '2K',
+    duration: durationInSeconds
+  };
+  
+  if (typeof StorageService !== 'undefined') {
+    StorageService.autoSave(generatedImageUrl, metadata)
+      .then(result => {
+        if (result) {
+          console.log('✅ Image auto-sauvegardée dans Supabase:', result.url);
+        }
+      })
+      .catch(err => console.warn('Auto-save échoué:', err.message));
+  }
 }
 
 // --- Before / After Slider ---
