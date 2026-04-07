@@ -68,7 +68,7 @@ function processFile(file) {
     uploadedImageData = e.target.result;
     const previewImg = document.getElementById('previewImg');
     previewImg.src = uploadedImageData;
-    
+
     document.getElementById('uploadPreview').style.display = 'block';
     document.getElementById('uploadZone').style.display = 'none';
 
@@ -95,7 +95,7 @@ function removeImage() {
 }
 
 // --- AI Analysis Integration (Nano Banana 2 API) ---
-const KIE_API_KEY = "9f0fb9a92aba158161bd6b3b67bea08d"; // For demo purposes only; do not expose in production
+const KIE_API_KEY = window.ENV?.KIE_API_KEY; // Loaded from js/env.js, do not expose in production
 
 async function startAnalysis() {
   if (!selectedSector) {
@@ -139,7 +139,7 @@ async function startAnalysis() {
     percentText.textContent = '100%';
     document.getElementById('scanTitle').textContent = 'Terminé ! Image sublimée prête.';
     document.getElementById('scanDesc').textContent = 'Génération réussie.';
-    
+
     setTimeout(() => showResult(imageUrl, duration), 1000);
   } catch (error) {
     console.error("API Error:", error);
@@ -155,7 +155,7 @@ async function uploadImageToTmpfiles(dataUrl) {
   const blob = await res.blob();
   const formData = new FormData();
   formData.append('file', blob, 'image.jpg');
-  
+
   const uploadRes = await fetch('https://tmpfiles.org/api/v1/upload', {
     method: 'POST',
     body: formData
@@ -171,7 +171,7 @@ async function runKieApiEnhancement(publicImageUrl, sector) {
   const style = getStyleLabel();
   const sectorLabel = getSectorLabel(sector);
   const prompt = `Professional high-end commercial photo shoot, highly detailed, visually stunning, studio lighting, 8k resolution photography, for a ${sectorLabel} business, in a ${style} style. Photorealistic, crisp focus, excellent composition.`;
-  
+
   const formatVal = document.getElementById('outputFormat')?.value || '2k';
   const resolution = formatVal === '4k' ? '4K' : '2K';
 
@@ -187,7 +187,7 @@ async function runKieApiEnhancement(publicImageUrl, sector) {
   };
 
   document.getElementById('scanDesc').textContent = 'Création de la tâche de rendu...';
-  
+
   const response = await fetch("https://api.kie.ai/api/v1/jobs/createTask", {
     method: "POST",
     headers: {
@@ -218,7 +218,7 @@ async function pollKieApiTask(taskId) {
 
   while (true) {
     await new Promise(r => setTimeout(r, 3000)); // Poll every 3 seconds
-    
+
     if (progress < 90) {
       progress += Math.floor(Math.random() * 8) + 2;
       progressBar.style.width = `${progress}%`;
@@ -236,13 +236,13 @@ async function pollKieApiTask(taskId) {
 
     const data = await response.json();
     if (data.code === 200 && data.data) {
-       const state = data.data.state;
-       if (state === "success") {
-          const resultJson = JSON.parse(data.data.resultJson);
-          return resultJson.resultUrls[0];
-       } else if (state === "fail") {
-          throw new Error(`La tâche a échoué: ${data.data.failMsg || 'Erreur GPU ou Serveur'}`);
-       }
+      const state = data.data.state;
+      if (state === "success") {
+        const resultJson = JSON.parse(data.data.resultJson);
+        return resultJson.resultUrls[0];
+      } else if (state === "fail") {
+        throw new Error(`La tâche a échoué: ${data.data.failMsg || 'Erreur GPU ou Serveur'}`);
+      }
     }
   }
 }
@@ -256,14 +256,14 @@ function showResult(generatedImageUrl, durationInSeconds) {
   const afterImg = document.getElementById('afterImage');
   const baSlider = document.getElementById('baSlider');
   const previewImg = document.getElementById('previewImg');
-  
+
   if (previewImg && previewImg.naturalWidth) {
     baSlider.style.aspectRatio = `${previewImg.naturalWidth} / ${previewImg.naturalHeight}`;
   }
-  
+
   beforeImg.src = uploadedImageData;
   afterImg.src = generatedImageUrl;
-  
+
   // Wait for the new AI image to load to set matching dimensions for the before image container
   afterImg.onload = () => {
     beforeImg.style.width = afterImg.offsetWidth + 'px';
@@ -292,7 +292,7 @@ function showResult(generatedImageUrl, durationInSeconds) {
     format: document.getElementById('outputFormat')?.value?.toUpperCase() || '2K',
     duration: durationInSeconds
   };
-  
+
   if (typeof StorageService !== 'undefined') {
     StorageService.autoSave(generatedImageUrl, metadata)
       .then(result => {
@@ -309,7 +309,7 @@ function initBeforeAfterSlider() {
   const slider = document.getElementById('baSlider');
   const before = document.getElementById('baBefore');
   const handle = document.getElementById('baHandle');
-  
+
   if (!slider) return;
 
   let isDragging = false;
@@ -318,7 +318,7 @@ function initBeforeAfterSlider() {
     const rect = slider.getBoundingClientRect();
     let pos = (x - rect.left) / rect.width;
     pos = Math.max(0.02, Math.min(0.98, pos));
-    
+
     before.style.width = (pos * 100) + '%';
     handle.style.left = (pos * 100) + '%';
   }
@@ -360,12 +360,12 @@ function initBeforeAfterSlider() {
 function downloadResult() {
   const afterImg = document.getElementById('afterImage');
   if (!afterImg?.src) return;
-  
+
   const link = document.createElement('a');
   link.download = `agence-ia-${selectedSector}-${Date.now()}.jpg`;
   link.href = afterImg.src;
   link.click();
-  
+
   showToast('✅', 'Image téléchargée avec succès !');
 }
 
@@ -472,14 +472,14 @@ async function generateVideoDemo() {
     showToast('⚠️', 'Veuillez d\'abord générer une image avant de créer une vidéo.');
     return;
   }
-  
+
   // Unlock & Show Step 5
   document.getElementById('step5').style.display = 'block';
   document.getElementById('step5').scrollIntoView({ behavior: 'smooth' });
-  
+
   document.getElementById('videoScanningState').style.display = 'block';
   document.getElementById('videoResultState').style.display = 'none';
-  
+
   const videoBtn = document.getElementById('generateVideoBtn');
   videoBtn.disabled = true;
   videoBtn.textContent = '⏳ Génération...';
@@ -492,7 +492,7 @@ async function generateVideoDemo() {
   try {
     videoImg1Url = afterImg.src;
     document.getElementById('videoImg1').src = videoImg1Url;
-    
+
     // Animate progress slightly while we wait
     let progress = 10;
     const interval = setInterval(() => {
@@ -507,7 +507,7 @@ async function generateVideoDemo() {
     const style = getStyleLabel();
     const sectorLabel = getSectorLabel(selectedSector);
     const prompt = `Same identical scene as reference, but from a DIFFERENT camera angle. Wide shot, cinematic camera movement, visually stunning, 8k resolution, for a ${sectorLabel} business, in a ${style} style. Photorealistic.`;
-    
+
     // We assume publicImageUrl is still valid or we pass the base64 again. But since we have the tmpfiles URL if the user hasn't refreshed:
     // We need to re-upload the afterImage just in case, but since afterImage is already a URL from KIE, we can pass it directly!
     // KIE returns a public URL in resultUrls. Let's pass it directly.
@@ -537,12 +537,12 @@ async function generateVideoDemo() {
 
     videoImg2Url = await pollKieApiTask(data.data.taskId);
     clearInterval(interval);
-    
+
     progressBar.style.width = '100%';
     percentText.textContent = '100%';
-    
+
     document.getElementById('videoImg2').src = videoImg2Url;
-    
+
     setTimeout(() => {
       document.getElementById('videoScanningState').style.display = 'none';
       document.getElementById('videoResultState').style.display = 'block';
@@ -560,7 +560,7 @@ async function generateVideoDemo() {
 
 function playVideoAnimation() {
   const container = document.getElementById('videoContainer');
-  
+
   // Remove class to reset animation
   container.classList.remove('video-animate');
   // Trigger reflow

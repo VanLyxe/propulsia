@@ -144,49 +144,6 @@
                 <option value="tropical">🌺 Tropical Polynésien</option>
               </select>
             </div>
-            <!-- Enhancement — styled check cards -->
-            <div class="form-group">
-              <label style="margin-bottom:12px; display:block;">Améliorations</label>
-              <div class="check-grid" id="enhancementChecks">
-
-                <label class="check-option checked" onclick="toggleCheckOption(this)" id="optBrightness">
-                  <input type="checkbox" id="enhBrightness" class="propulsia-check" checked>
-                  <span class="check-box"></span>
-                  <span class="check-label">
-                    <strong>Luminosité optimisée</strong>
-                    <span>Éclairage naturel et équilibré</span>
-                  </span>
-                </label>
-
-                <label class="check-option checked" onclick="toggleCheckOption(this)" id="optContrast">
-                  <input type="checkbox" id="enhContrast" class="propulsia-check" checked>
-                  <span class="check-box"></span>
-                  <span class="check-label">
-                    <strong>Contraste amélioré</strong>
-                    <span>Profondeur et relief accentués</span>
-                  </span>
-                </label>
-
-                <label class="check-option checked" onclick="toggleCheckOption(this)" id="optSaturation">
-                  <input type="checkbox" id="enhSaturation" class="propulsia-check" checked>
-                  <span class="check-box"></span>
-                  <span class="check-label">
-                    <strong>Couleurs vivantes</strong>
-                    <span>Saturation et vibrance boostées</span>
-                  </span>
-                </label>
-
-                <label class="check-option" onclick="toggleCheckOption(this)" id="optSharpness">
-                  <input type="checkbox" id="enhSharpness" class="propulsia-check">
-                  <span class="check-box"></span>
-                  <span class="check-label">
-                    <strong>Netteté renforcée</strong>
-                    <span>Détails nets et précis</span>
-                  </span>
-                </label>
-
-              </div>
-            </div>
           </div>
           <div style="text-align:center; margin-top:32px;">
             <button class="btn btn-primary btn-lg" id="generateBtn" onclick="startAnalysis()">
@@ -332,6 +289,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
   <script src="js/supabase-config.js"></script>
+  <script src="js/env.js"></script>
   <script src="js/main.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/demo.js"></script>

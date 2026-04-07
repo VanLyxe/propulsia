@@ -32,7 +32,7 @@ async function handleLogin(e) {
   if (!email || !password) return;
 
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await window.supabaseClient.auth.signInWithPassword({
       email: email,
       password: password,
     });
@@ -68,7 +68,7 @@ async function handleRegister(e) {
   }
 
   try {
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await window.supabaseClient.auth.signUp({
       email: email,
       password: password,
       options: {
@@ -105,8 +105,8 @@ async function handleRegister(e) {
 
 // --- Check Auth & Access Control ---
 async function checkAuth() {
-  if (!supabase) return null;
-  const { data, error } = await supabase.auth.getSession();
+  if (!window.supabaseClient) return null;
+  const { data, error } = await window.supabaseClient.auth.getSession();
   if (error || !data || !data.session) return null;
   return data.session.user;
 }
@@ -131,8 +131,8 @@ async function hasAccess(requiredRole) {
 
 // --- Logout ---
 async function logout() {
-  if (supabase) {
-    await supabase.auth.signOut();
+  if (window.supabaseClient) {
+    await window.supabaseClient.auth.signOut();
   }
   window.location.href = 'index.html';
 }
@@ -202,7 +202,7 @@ async function processSubscription(e) {
 
   try {
     // Save subscription logic securely in Supabase metadata
-    const { data, error } = await supabase.auth.updateUser({
+    const { data, error } = await window.supabaseClient.auth.updateUser({
       data: {
         role: 'subscriber',
         plan: 'pro',
@@ -244,8 +244,13 @@ async function handleForgotPassword(e) {
   }
 
   try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: (window.location.hostname === 'localhost' ? 'http://127.0.0.1:5500' : window.location.origin) + '/reset-password.html',
+    // Forcer localhost sans port pour éviter les problèmes avec différents serveurs
+    const baseUrl = window.location.hostname === 'localhost' 
+      ? 'http://localhost' 
+      : window.location.origin;
+    
+    const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: baseUrl + '/propulsia/reset-password.html',
     });
 
     if (error) throw error;
@@ -280,8 +285,13 @@ async function resendResetEmail() {
   }
 
   try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: (window.location.hostname === 'localhost' ? 'http://127.0.0.1:5500' : window.location.origin) + '/reset-password.html',
+    // Forcer localhost sans port pour éviter les problèmes avec différents serveurs
+    const baseUrl = window.location.hostname === 'localhost' 
+      ? 'http://localhost' 
+      : window.location.origin;
+    
+    const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: baseUrl + '/propulsia/reset-password.html',
     });
 
     if (error) throw error;
@@ -395,7 +405,7 @@ async function verifyResetToken() {
 
   try {
     // Échanger le token pour établir une session
-    const { data, error } = await supabase.auth.setSession({
+    const { data, error } = await window.supabaseClient.auth.setSession({
       access_token: accessToken,
       refresh_token: refreshToken || ''
     });
@@ -434,7 +444,7 @@ async function checkEmailVerification(user) {
 // --- Resend verification email ---
 async function resendVerificationEmail(email) {
   try {
-    const { error } = await supabase.auth.resend({
+    const { error } = await window.supabaseClient.auth.resend({
       type: 'signup',
       email: email,
       options: {
@@ -486,7 +496,7 @@ async function verifyEmailToken() {
     }
   } else {
     // Pas de token dans l'URL, vérifier la session
-    const { data } = await supabase.auth.getSession();
+    const { data } = await window.supabaseClient.auth.getSession();
     if (data.session?.user?.email_confirmed_at) {
       loadingDiv.style.display = 'none';
       successDiv.style.display = 'block';
