@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Votre compte PropulsIA — Gérez vos informations personnelles et votre abonnement.">
+  <title>Mon Compte — PropulsIA</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="header scrolled" id="header">
+    <div class="container">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">⚡</div>
+        <span>PropulsIA</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Accueil</a>
+        <a href="index.html#services">Services</a>
+        <a href="production.html">Production</a>
+        <a href="booking.html">Planifier RDV</a>
+      </nav>
+      <div class="nav-cta">
+        <a href="account.html" class="btn btn-secondary btn-sm" id="navLoginBtn">Mon compte</a>
+      </div>
+      <div class="mobile-menu-btn" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-close" onclick="toggleMobileMenu()">✕</div>
+    <a href="index.html" onclick="toggleMobileMenu()">Accueil</a>
+    <a href="production.html">Production</a>
+    <a href="booking.html">Planifier RDV</a>
+    <a href="account.html" class="btn btn-secondary" id="mobileLoginBtn">Mon compte</a>
+  </div>
+
+  <!-- Main -->
+  <main style="padding-top:100px; min-height:100vh;">
+    <div class="container" style="max-width:700px;">
+
+      <!-- Loading -->
+      <div id="accountLoading" style="text-align:center; padding:80px 0;">
+        <div style="font-size:3rem; margin-bottom:16px;">⏳</div>
+        <p style="color:var(--text-muted);">Chargement de votre compte...</p>
+      </div>
+
+      <!-- Account Info (hidden until loaded) -->
+      <div id="accountContent" style="display:none;">
+        <div style="text-align:center; margin-bottom:48px;">
+          <div style="width:80px; height:80px; background:var(--gradient-primary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 16px; font-weight:700; color:#050506;" id="accountAvatar">?</div>
+          <h1 class="section-title" style="margin-bottom:8px;" id="accountFullName">—</h1>
+          <p style="color:var(--text-muted); font-size:1rem;" id="accountEmail">—</p>
+        </div>
+
+        <!-- Infos Card -->
+        <div class="glass-card" style="padding:32px; margin-bottom:24px;">
+          <h3 style="font-size:1.1rem; margin-bottom:24px; display:flex; align-items:center; gap:10px;">
+            <span style="font-size:1.3rem;">👤</span> Informations personnelles
+          </h3>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+            <div>
+              <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">Prénom</div>
+              <div style="font-size:1rem; font-weight:500;" id="accountFirstName">—</div>
+            </div>
+            <div>
+              <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">Nom</div>
+              <div style="font-size:1rem; font-weight:500;" id="accountLastName">—</div>
+            </div>
+            <div>
+              <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">Email</div>
+              <div style="font-size:1rem; font-weight:500;" id="accountEmailDetail">—</div>
+            </div>
+            <div>
+              <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">Entreprise</div>
+              <div style="font-size:1rem; font-weight:500;" id="accountCompany">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plan Card -->
+        <div class="glass-card" style="padding:32px; margin-bottom:24px; border-color:rgba(170,255,0,0.2);">
+          <h3 style="font-size:1.1rem; margin-bottom:24px; display:flex; align-items:center; gap:10px;">
+            <span style="font-size:1.3rem;">⚡</span> Abonnement
+          </h3>
+          <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+            <div style="width:48px; height:48px; background:rgba(170,255,0,0.1); border:1px solid rgba(170,255,0,0.3); border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; font-size:1.5rem;" id="planIcon">🆓</div>
+            <div>
+              <div style="font-size:1.1rem; font-weight:600;" id="accountPlanName">Plan Découverte</div>
+              <div style="font-size:0.85rem; color:var(--text-muted);" id="accountPlanDesc">Gratuit — 3 générations / mois</div>
+            </div>
+          </div>
+          <a href="subscribe.html" class="btn btn-primary btn-sm" id="upgradePlanBtn">⭐ Passer au Pro</a>
+        </div>
+
+        <!-- Actions -->
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <a href="production.html" class="btn btn-secondary" style="width:100%; text-align:center;">📊 Espace production</a>
+          <button class="btn" onclick="logout()" style="width:100%; background:rgba(248,113,113,0.1); border:1px solid rgba(248,113,113,0.3); color:#f87171; cursor:pointer; transition:all 0.3s;"
+            onmouseover="this.style.background='rgba(248,113,113,0.2)'"
+            onmouseout="this.style.background='rgba(248,113,113,0.1)'">
+            🚪 Se déconnecter
+          </button>
+        </div>
+      </div>
+
+      <!-- Not logged in state -->
+      <div id="accountNotLogged" style="display:none; text-align:center; padding:60px 0;">
+        <div style="font-size:4rem; margin-bottom:16px;">🔒</div>
+        <h2 style="font-size:1.3rem; margin-bottom:12px;">Vous n'êtes pas connecté</h2>
+        <p style="color:var(--text-muted); margin-bottom:24px;">Connectez-vous pour accéder à votre compte.</p>
+        <a href="login.html" class="btn btn-primary">Se connecter →</a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer" style="margin-top:80px;">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:none; padding-top:0;">
+        <span>© 2026 PropulsIA — propulsia.io. Tous droits réservés.</span>
+        <a href="index.html" style="color:var(--primary);">← Retour à l'accueil</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast">
+    <span id="toastIcon">✅</span>
+    <span id="toastMessage"></span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    // Charger les infos du compte au chargement
+    document.addEventListener('DOMContentLoaded', async () => {
+      const loadingDiv = document.getElementById('accountLoading');
+      const contentDiv = document.getElementById('accountContent');
+      const notLoggedDiv = document.getElementById('accountNotLogged');
+
+      // Attendre que Supabase soit prêt
+      await new Promise(r => setTimeout(r, 300));
+
+      const user = await checkAuth();
+
+      if (!user) {
+        loadingDiv.style.display = 'none';
+        notLoggedDiv.style.display = 'block';
+        return;
+      }
+
+      const meta = user.user_metadata || {};
+      const firstName = meta.first_name || '';
+      const lastName = meta.last_name || '';
+      const email = user.email || '';
+      const company = meta.company || 'Non renseignée';
+      const plan = meta.plan || 'discover';
+      const role = meta.role || 'prospect';
+
+      // Avatar initials
+      const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || email.charAt(0).toUpperCase();
+      document.getElementById('accountAvatar').textContent = initials;
+
+      // Full name
+      const fullName = (firstName + ' ' + lastName).trim() || email.split('@')[0];
+      document.getElementById('accountFullName').textContent = fullName;
+      document.getElementById('accountEmail').textContent = email;
+
+      // Details
+      document.getElementById('accountFirstName').textContent = firstName || 'Non renseigné';
+      document.getElementById('accountLastName').textContent = lastName || 'Non renseigné';
+      document.getElementById('accountEmailDetail').textContent = email;
+      document.getElementById('accountCompany').textContent = company;
+
+      // Plan
+      const planNames = { discover: 'Plan Découverte', pro: 'Plan Professionnel', enterprise: 'Plan Entreprise' };
+      const planDescs = { discover: 'Gratuit — 3 générations / mois', pro: '29 900 XPF/mois — Accès complet', enterprise: 'Sur mesure — Agences & grands comptes' };
+      const planIcons = { discover: '🆓', pro: '⭐', enterprise: '🏢' };
+
+      document.getElementById('accountPlanName').textContent = planNames[plan] || planNames.discover;
+      document.getElementById('accountPlanDesc').textContent = planDescs[plan] || planDescs.discover;
+      document.getElementById('planIcon').textContent = planIcons[plan] || '🆓';
+
+      // Hide upgrade button if already pro or enterprise
+      if (plan === 'pro' || plan === 'enterprise' || role === 'subscriber' || role === 'admin') {
+        document.getElementById('upgradePlanBtn').style.display = 'none';
+      }
+
+      loadingDiv.style.display = 'none';
+      contentDiv.style.display = 'block';
+    });
+  </script>
+</body>
+
+</html>

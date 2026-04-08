@@ -138,8 +138,36 @@ function animateCounters() {
   });
 }
 
+// --- Update Nav Auth State ---
+// Remplace "Connexion" par "Mon compte" si l'utilisateur est connecté
+async function updateAuthNav() {
+  // Attendre que Supabase soit initialisé
+  if (!window.supabaseClient) return;
+
+  try {
+    const { data } = await window.supabaseClient.auth.getSession();
+    if (data?.session?.user) {
+      const navBtn = document.getElementById('navLoginBtn');
+      const mobileBtn = document.getElementById('mobileLoginBtn');
+
+      if (navBtn) {
+        navBtn.href = 'account.html';
+        navBtn.textContent = 'Mon compte';
+      }
+      if (mobileBtn) {
+        mobileBtn.href = 'account.html';
+        mobileBtn.textContent = 'Mon compte';
+      }
+    }
+  } catch (e) {
+    console.warn('Auth nav check failed:', e.message);
+  }
+}
+
 // --- Init ---
 document.addEventListener('DOMContentLoaded', () => {
   initReveal();
   initParticles();
+  // Mettre à jour la nav après un court délai pour laisser Supabase s'initialiser
+  setTimeout(updateAuthNav, 200);
 });

@@ -75,6 +75,7 @@ async function handleLogin(e) {
   e.preventDefault();
   const email = document.getElementById('loginEmail')?.value;
   const password = document.getElementById('loginPassword')?.value;
+  const rememberMe = document.getElementById('rememberMe')?.checked;
 
   if (!email || !password) return;
 
@@ -85,6 +86,15 @@ async function handleLogin(e) {
     });
 
     if (error) throw error;
+
+    // Sauvegarder l'email si "Se souvenir de moi" est coché
+    if (rememberMe) {
+      localStorage.setItem('propulsia_remember_email', email);
+      localStorage.setItem('propulsia_remember_checked', 'true');
+    } else {
+      localStorage.removeItem('propulsia_remember_email');
+      localStorage.removeItem('propulsia_remember_checked');
+    }
 
     const userMeta = data.user.user_metadata || {};
     const name = userMeta.first_name || email.split('@')[0];
@@ -97,6 +107,32 @@ async function handleLogin(e) {
   } catch (error) {
     showToast('⚠️', 'Email ou mot de passe incorrect.');
     console.error('Login error:', error.message);
+  }
+}
+
+// --- Init Login Page : pré-remplissage + redirection si déjà connecté ---
+async function initLoginPage() {
+  // Pré-remplir l'email si "Se souvenir de moi" était coché
+  const savedEmail = localStorage.getItem('propulsia_remember_email');
+  const wasChecked = localStorage.getItem('propulsia_remember_checked');
+
+  if (savedEmail && wasChecked) {
+    const emailInput = document.getElementById('loginEmail');
+    const rememberBox = document.getElementById('rememberMe');
+    if (emailInput) emailInput.value = savedEmail;
+    if (rememberBox) rememberBox.checked = true;
+  }
+
+  // Rediriger si déjà connecté
+  if (window.supabaseClient) {
+    try {
+      const { data } = await window.supabaseClient.auth.getSession();
+      if (data?.session?.user) {
+        window.location.href = 'production.html';
+      }
+    } catch (e) {
+      // Silencieux
+    }
   }
 }
 

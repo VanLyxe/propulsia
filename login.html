@@ -47,7 +47,7 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
           <label
             style="display:flex; align-items:center; gap:8px; font-size:0.85rem; color:var(--text-muted); cursor:pointer;">
-            <input type="checkbox" style="cursor:pointer; accent-color:var(--primary);"> Se souvenir de moi
+            <input type="checkbox" id="rememberMe" style="cursor:pointer; accent-color:var(--primary);"> Se souvenir de moi
           </label>
           <a href="forgot-password.html" style="font-size:0.85rem; color:var(--primary);">Mot de passe oublié ?</a>
         </div>
@@ -126,6 +126,11 @@
   <script src="js/supabase-config.js"></script>
   <script src="js/main.js"></script>
   <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(initLoginPage, 200);
+    });
+  </script>
 </body>
 
 </html>
