@@ -62,10 +62,47 @@ function processFile(file) {
     return;
   }
 
+  if (!selectedSector) {
+    showToast('⚠️', 'Veuillez d\'abord sélectionner un secteur d\'activité.');
+    return;
+  }
+
+  showToast('⏳', 'Vérification de l\'image par IA... 🤔');
+
   uploadedImage = file;
   const reader = new FileReader();
-  reader.onload = (e) => {
-    uploadedImageData = e.target.result;
+  reader.onload = async (e) => {
+    const dataUrl = e.target.result;
+    
+    // Validation avec Gemini
+    const result = await validateImageWithGemini(dataUrl, selectedSector);
+    
+    if (!result.valid) {
+      removeImage();
+      if (result.error) {
+        // Erreur technique
+        showImageError(
+          'Problème technique',
+          result.error,
+          null
+        );
+      } else {
+        // Image non conforme au secteur
+        const sectorLabel = getSectorLabel(selectedSector);
+        const expectedImages = getSectorExpectedImages(selectedSector);
+        showImageError(
+          `Image non conforme au secteur ${sectorLabel}`,
+          result.reason || `L'image que vous avez importée ne correspond pas au secteur « ${sectorLabel} ».`,
+          expectedImages
+        );
+      }
+      return;
+    }
+
+    // Fermer le modal d'erreur s'il est ouvert
+    hideImageError();
+
+    uploadedImageData = dataUrl;
     const previewImg = document.getElementById('previewImg');
     previewImg.src = uploadedImageData;
 
@@ -76,8 +113,228 @@ function processFile(file) {
     const step3 = document.getElementById('step3');
     step3.style.opacity = '1';
     step3.style.pointerEvents = 'auto';
+    
+    showToast('✅', 'Image validée avec succès par l\'IA ! ✨');
   };
   reader.readAsDataURL(file);
+}
+
+// Fonction de validation d'image via Gemini 3 Flash (via kie.ai proxy)
+async function validateImageWithGemini(dataUrl, sector) {
+  // Utilise la clé KIE qui fonctionne pour le proxy Gemini sur api.kie.ai
+  const apiKey = window.ENV?.KIE_API_KEY;
+  if (!apiKey) {
+    return { valid: false, error: "Clé API KIE introuvable dans env.js.", reason: null }; 
+  }
+
+  const parts = dataUrl.split(',');
+  const mimeType = parts[0].match(/:(.*?);/)[1];
+  const base64Data = parts[1];
+  const sectorLabel = getSectorLabel(sector);
+  const expectedImages = getSectorExpectedImages(sector);
+
+  const sectorRules = getSectorValidationRules(sector);
+
+  const prompt = `Tu es un système strict de validation d'images pour une plateforme marketing.
+L'utilisateur a sélectionné le secteur d'activité : "${sectorLabel}".
+
+Voici les SEULS types d'images acceptés pour ce secteur :
+${sectorRules}
+
+Analyse l'image fournie et détermine si elle correspond à AU MOINS UN des critères listés ci-dessus.
+Si l'image ne correspond à AUCUN de ces critères, elle doit être rejetée.
+
+Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans backticks) dans ce format exact :
+{"valid": true} ou {"valid": false, "reason": "Explication courte en français de pourquoi l'image ne correspond pas au secteur"}
+
+Ne donne aucune autre réponse que le JSON.`;
+
+  try {
+    const response = await fetch("https://api.kie.ai/gemini/v1/models/gemini-3-flash-v1betamodels:streamGenerateContent", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        stream: true,
+        contents: [{
+          role: "user",
+          parts: [
+            { text: prompt },
+            {
+              inline_data: {
+                mime_type: mimeType,
+                data: base64Data
+              }
+            }
+          ]
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      let statusString = response.status.toString();
+      return { valid: false, error: `API Gemini (${statusString}): ${errText.substring(0,120)}`, reason: null };
+    }
+    
+    // Lire le body complet en texte pour le parser de manière robuste
+    const rawBody = await response.text();
+    console.log("Gemini raw body:", rawBody);
+
+    // Extraire le texte Gemini depuis différents formats possibles de réponse
+    let fullText = "";
+
+    // Helper : extraire le texte d'un objet réponse Gemini
+    function extractTextFromGeminiObj(obj) {
+      return obj?.candidates?.[0]?.content?.parts
+        ?.filter(p => p.text)
+        ?.map(p => p.text)
+        ?.join("") ?? "";
+    }
+
+    // Stratégie 1 : JSON simple (réponse non-stream)
+    try {
+      const json = JSON.parse(rawBody);
+      if (Array.isArray(json)) {
+        // Tableau de chunks SSE
+        fullText = json.map(extractTextFromGeminiObj).join("");
+      } else {
+        fullText = extractTextFromGeminiObj(json);
+      }
+    } catch {
+      // Stratégie 2 : lignes SSE (data: {...}) ou JSON par ligne
+      const lines = rawBody.split("\n").filter(Boolean);
+      for (const rawLine of lines) {
+        let line = rawLine.trim();
+        // Retirer le préfixe SSE "data: "
+        if (line.startsWith("data:")) {
+          line = line.substring(5).trim();
+        }
+        if (line === "[DONE]" || line === "") continue;
+        try {
+          const json = JSON.parse(line);
+          fullText += extractTextFromGeminiObj(json);
+        } catch { /* ligne partielle, on continue */ }
+      }
+    }
+
+    if (!fullText) {
+       console.error("Gemini : aucun texte extrait. Body brut:", rawBody.substring(0, 500));
+       return { valid: false, error: "Analyse bloquée (réponse vide ou format inattendu).", reason: null };
+    }
+
+    console.log("Gemini texte extrait:", fullText);
+
+    // Parse la réponse JSON de Gemini (le modèle doit répondre {"valid": true/false})
+    try {
+      const cleaned = fullText.trim().replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      const parsed = JSON.parse(cleaned);
+      return { 
+        valid: parsed.valid === true, 
+        error: null, 
+        reason: parsed.reason || null 
+      };
+    } catch (parseErr) {
+      // Fallback : chercher des indices dans la réponse texte brute
+      console.warn("Gemini n'a pas répondu en JSON pur, fallback texte:", fullText);
+      const lower = fullText.toLowerCase();
+      if (lower.includes('"valid": true') || lower.includes('"valid":true')) {
+        return { valid: true, error: null, reason: null };
+      }
+      // Extraire la raison si possible
+      const reasonMatch = fullText.match(/"reason"\s*:\s*"([^"]+)"/);
+      return { 
+        valid: false, 
+        error: null, 
+        reason: reasonMatch ? reasonMatch[1] : "L'image ne semble pas correspondre au secteur sélectionné." 
+      };
+    }
+  } catch (error) {
+    console.error("Erreur validateImageWithGemini:", error);
+    return { valid: false, error: error.message, reason: null };
+  }
+}
+
+// Retourne les règles de validation détaillées pour chaque secteur (utilisé dans le prompt Gemini)
+function getSectorValidationRules(sector) {
+  const rules = {
+    restaurant: `- Un plat cuisiné ou de la nourriture présentée
+- Une boisson (verre, cocktail, bouteille sur une table, etc.)
+- Un bâtiment vu de l'intérieur dans lequel on voit des tables et des chaises en nombre (caractéristique d'un restaurant)
+- Un bâtiment vu de l'intérieur dans lequel on voit un bar / comptoir`,
+    immobilier: `- Tout type de bâtiment, que ce soit vu de l'extérieur ou de l'intérieur
+- Même un bâtiment en ruine, en construction, ou détruit est accepté
+- Maisons, appartements, immeubles, villas, façades, pièces à vivre, jardins`,
+    auto: `- Tout type de véhicule : voiture, moto, camion, scooter, vélo, etc.
+- Un bâtiment dans lequel on peut voir des véhicules (garage, concession, atelier mécanique, parking)`,
+    hotel: `- Un bâtiment vu de l'intérieur montrant des chambres d'hôtel
+- Un bâtiment vu de l'intérieur montrant des salles de bains
+- Un bâtiment vu de l'intérieur montrant une réception / accueil / lobby`,
+    coiffure: `- Des personnes qui montrent leur coiffure ou se font coiffer
+- Un bâtiment vu de l'intérieur avec des sièges face à des miroirs et du matériel de coiffure`
+  };
+  return rules[sector] || 'Images en rapport avec le secteur';
+}
+
+// Retourne un résumé des images attendues pour l'affichage dans le modal d'erreur
+function getSectorExpectedImages(sector) {
+  const expected = {
+    restaurant: 'Plats, boissons, intérieur de restaurant avec tables/chaises, bar ou comptoir',
+    immobilier: 'Tout type de bâtiment (intérieur ou extérieur, même en ruine ou en construction)',
+    auto: 'Véhicules de tout genre, garages, concessions, ateliers avec véhicules',
+    hotel: "Intérieur de bâtiment avec chambres, salles de bains, ou réception/lobby",
+    coiffure: 'Personnes montrant leur coiffure, intérieur de salon avec sièges face à des miroirs et matériel de coiffure'
+  };
+  return expected[sector] || 'Images en rapport avec le secteur';
+}
+
+// Affiche le modal d'erreur d'image
+function showImageError(title, reason, expectedImages) {
+  let modal = document.getElementById('imageErrorModal');
+  
+  // Créer le modal s'il n'existe pas
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'imageErrorModal';
+    modal.className = 'image-error-modal';
+    document.body.appendChild(modal);
+  }
+
+  const expectedHtml = expectedImages 
+    ? `<div class="image-error-expected">
+        <strong>📋 Images acceptées pour ce secteur :</strong>
+        <p>${expectedImages}</p>
+      </div>` 
+    : '';
+
+  modal.innerHTML = `
+    <div class="image-error-backdrop" onclick="hideImageError()"></div>
+    <div class="image-error-content glass-card">
+      <button class="image-error-close" onclick="hideImageError()">✕</button>
+      <div class="image-error-icon">🚫</div>
+      <h3 class="image-error-title">${title}</h3>
+      <p class="image-error-reason">${reason}</p>
+      ${expectedHtml}
+      <div class="image-error-actions">
+        <button class="btn btn-primary" onclick="hideImageError(); document.getElementById('fileInput').click();">📸 Choisir une autre image</button>
+        <button class="btn btn-secondary" onclick="hideImageError()">Fermer</button>
+      </div>
+    </div>
+  `;
+
+  modal.classList.add('active');
+  // Aussi montrer un toast pour feedback
+  showToast('🚫', 'Image rejetée — elle ne correspond pas au secteur.');
+}
+
+// Cache le modal d'erreur
+function hideImageError() {
+  const modal = document.getElementById('imageErrorModal');
+  if (modal) {
+    modal.classList.remove('active');
+  }
 }
 
 function removeImage() {

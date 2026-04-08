@@ -2,6 +2,53 @@
 // AGENCE IA - Auth Module (Supabase)
 // ===========================
 
+// URL de base pour les redirections Supabase (doit correspondre au Site URL dans le Dashboard Supabase)
+const AUTH_BASE_URL = 'http://localhost:3000';
+
+// --- Toggle Password Visibility ---
+function togglePasswordVisibility(btn) {
+  const input = btn.parentElement.querySelector('input');
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+    btn.title = 'Masquer le mot de passe';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁️';
+    btn.title = 'Afficher le mot de passe';
+  }
+}
+
+// Initialise les boutons toggle sur tous les champs password de la page
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('input[type="password"]').forEach(input => {
+    // Wrapper relatif pour le positionnement du bouton
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'position:relative; width:100%;';
+    input.parentNode.insertBefore(wrapper, input);
+    wrapper.appendChild(input);
+
+    // Bouton œil
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = '👁️';
+    btn.title = 'Afficher le mot de passe';
+    btn.style.cssText = `
+      position:absolute; right:12px; top:50%; transform:translateY(-50%);
+      background:none; border:none; cursor:pointer; font-size:1.1rem;
+      padding:4px; line-height:1; opacity:0.6; transition:opacity 0.2s;
+    `;
+    btn.addEventListener('mouseenter', () => btn.style.opacity = '1');
+    btn.addEventListener('mouseleave', () => btn.style.opacity = '0.6');
+    btn.addEventListener('click', () => togglePasswordVisibility(btn));
+    wrapper.appendChild(btn);
+
+    // Ajouter du padding à droite pour que le texte ne passe pas sous le bouton
+    input.style.paddingRight = '44px';
+  });
+});
+
 // --- Auth Tab Switching ---
 function switchAuthTab(tab) {
   const loginForm = document.getElementById('loginForm');
@@ -72,7 +119,7 @@ async function handleRegister(e) {
       email: email,
       password: password,
       options: {
-        emailRedirectTo: (window.location.hostname === 'localhost' ? 'http://127.0.0.1:5500' : window.location.origin) + '/verify-email.html',
+        emailRedirectTo: AUTH_BASE_URL + '/verify-email.html',
         data: {
           first_name: firstName,
           last_name: lastName,
@@ -244,13 +291,12 @@ async function handleForgotPassword(e) {
   }
 
   try {
-    // Forcer localhost sans port pour éviter les problèmes avec différents serveurs
-    const baseUrl = window.location.hostname === 'localhost' 
-      ? 'http://localhost' 
-      : window.location.origin;
+    // Utiliser l'URL de base pour la redirection (doit correspondre au Site URL Supabase)
+    const redirectUrl = AUTH_BASE_URL + '/reset-password.html';
+    console.log('Reset redirect URL:', redirectUrl);
     
     const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
-      redirectTo: baseUrl + '/propulsia/reset-password.html',
+      redirectTo: redirectUrl,
     });
 
     if (error) throw error;
@@ -285,13 +331,11 @@ async function resendResetEmail() {
   }
 
   try {
-    // Forcer localhost sans port pour éviter les problèmes avec différents serveurs
-    const baseUrl = window.location.hostname === 'localhost' 
-      ? 'http://localhost' 
-      : window.location.origin;
+    // Utiliser l'URL de base pour la redirection (doit correspondre au Site URL Supabase)
+    const redirectUrl = AUTH_BASE_URL + '/reset-password.html';
     
     const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
-      redirectTo: baseUrl + '/propulsia/reset-password.html',
+      redirectTo: redirectUrl,
     });
 
     if (error) throw error;
@@ -361,7 +405,7 @@ async function handleResetPassword(e) {
   }
 
   try {
-    const { error } = await supabase.auth.updateUser({
+    const { error } = await window.supabaseClient.auth.updateUser({
       password: newPassword
     });
 
