@@ -95,7 +95,7 @@
             <div style="width:48px; height:48px; background:rgba(170,255,0,0.1); border:1px solid rgba(170,255,0,0.3); border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; font-size:1.5rem;" id="planIcon">🆓</div>
             <div>
               <div style="font-size:1.1rem; font-weight:600;" id="accountPlanName">Plan Découverte</div>
-              <div style="font-size:0.85rem; color:var(--text-muted);" id="accountPlanDesc">Gratuit — 3 générations / mois</div>
+              <div style="font-size:0.85rem; color:var(--text-muted);" id="accountPlanDesc">Gratuit — 5 images + 1 vidéo / mois</div>
             </div>
           </div>
           <a href="subscribe.html" class="btn btn-primary btn-sm" id="upgradePlanBtn">⭐ Passer au Pro</a>
@@ -141,6 +141,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/quota.js"></script>
   <script src="js/main.js"></script>
   <script>
     // Charger les infos du compte au chargement
@@ -185,7 +186,7 @@
 
       // Plan
       const planNames = { discover: 'Plan Découverte', pro: 'Plan Professionnel', enterprise: 'Plan Entreprise' };
-      const planDescs = { discover: 'Gratuit — 3 générations / mois', pro: '29 900 XPF/mois — Accès complet', enterprise: 'Sur mesure — Agences & grands comptes' };
+      const planDescs = { discover: 'Gratuit — 5 images + 1 vidéo / mois', pro: '29 900 XPF/mois — Images illimitées + 15 vidéos', enterprise: 'Sur mesure — Tout illimité' };
       const planIcons = { discover: '🆓', pro: '⭐', enterprise: '🏢' };
 
       document.getElementById('accountPlanName').textContent = planNames[plan] || planNames.discover;

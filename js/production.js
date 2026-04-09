@@ -192,20 +192,19 @@ function generateEmailPreview() {
 
 // ===========================
 // PROPULSIA - Watermark Engine
-// Applies brand watermark on free plan exports
+// Filigrane centré transparent pour le plan gratuit
 // ===========================
 
 /**
- * Applies PropulsIA watermark to an image element or canvas.
- * @param {HTMLImageElement|HTMLCanvasElement} source - The image/canvas to watermark
- * @param {string} planType - 'free' triggers watermark, 'pro'/'enterprise' skips it
- * @returns {HTMLCanvasElement} Canvas with watermark applied (or original if paid plan)
+ * Applique le filigrane "PropulsIA" centré en transparence sur l'image.
+ * @param {HTMLImageElement|HTMLCanvasElement} source
+ * @param {boolean} applyWatermark - true pour appliquer le filigrane
+ * @returns {HTMLCanvasElement}
  */
-function applyPropulsIAWatermark(source, planType = 'free') {
+function applyPropulsIAWatermark(source, applyWatermark = true) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 
-  // Get dimensions
   const width = source.naturalWidth || source.width || 800;
   const height = source.naturalHeight || source.height || 600;
   canvas.width = width;
@@ -214,67 +213,67 @@ function applyPropulsIAWatermark(source, planType = 'free') {
   // Draw original image
   ctx.drawImage(source, 0, 0, width, height);
 
-  if (planType !== 'free') return canvas; // No watermark for paid plans
+  if (!applyWatermark) return canvas;
 
-  // --- PropulsIA Watermark --- 
-  const padding = 14;
-  const barHeight = 36;
-  const fontSize = Math.max(12, Math.round(height * 0.025));
+  // --- Filigrane centré en diagonale ---
+  ctx.save();
+  ctx.translate(width / 2, height / 2);
+  ctx.rotate(-Math.PI / 6); // Rotation de -30°
 
-  // Semi-transparent background strip
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
-  ctx.fillRect(0, height - barHeight, width, barHeight);
-
-  // Neon green glow text
-  ctx.shadowColor = '#AAFF00';
-  ctx.shadowBlur = 6;
-  ctx.fillStyle = '#AAFF00';
-  ctx.font = `bold ${fontSize}px 'Outfit', sans-serif`;
+  const fontSize = Math.max(40, Math.round(Math.min(width, height) * 0.12));
+  ctx.font = `bold ${fontSize}px 'Outfit', Arial, sans-serif`;
+  ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.textAlign = 'right';
-  ctx.fillText('⚡ PropulsIA', width - padding, height - barHeight / 2);
 
-  // Reset shadow
+  // Ombre pour lisibilité
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetX = 2;
+  ctx.shadowOffsetY = 2;
+
+  // Texte blanc semi-transparent
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+  ctx.fillText('PropulsIA', 0, 0);
+
+  // Contour pour renforcer la visibilité
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+  ctx.lineWidth = 2;
+  ctx.strokeText('PropulsIA', 0, 0);
+
+  ctx.restore();
+
+  // Petit badge en bas à droite
+  const smallFontSize = Math.max(12, Math.round(height * 0.02));
+  ctx.font = `bold ${smallFontSize}px 'Outfit', Arial, sans-serif`;
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'bottom';
+  ctx.fillStyle = 'rgba(170, 255, 0, 0.5)';
+  ctx.shadowColor = 'rgba(0,0,0,0.5)';
+  ctx.shadowBlur = 4;
+  ctx.fillText('⚡ PropulsIA — Plan Gratuit', width - 10, height - 10);
   ctx.shadowBlur = 0;
 
   return canvas;
 }
 
 /**
- * Watermarks an <img> element in-place (replaces src with watermarked canvas data URL).
- * Call this after image generation on free plan.
- * @param {string} imgId - ID of the <img> element
- * @param {string} planType - 'free' | 'pro' | 'enterprise'
+ * Applique le filigrane sur un élément <img> en place.
+ * @param {string} imgId - ID de l'élément <img>
+ * @param {boolean} apply - true pour appliquer
  */
-function watermarkImageById(imgId, planType = 'free') {
-  if (planType !== 'free') return;
+function watermarkImageById(imgId, apply = true) {
+  if (!apply) return;
   const img = document.getElementById(imgId);
   if (!img) return;
 
-  img.onload = function() {
-    const watermarked = applyPropulsIAWatermark(img, planType);
-    img.src = watermarked.toDataURL('image/jpeg', 0.92);
-  };
-
-  // If already loaded
-  if (img.complete && img.naturalWidth > 0) {
-    const watermarked = applyPropulsIAWatermark(img, planType);
+  function doWatermark() {
+    const watermarked = applyPropulsIAWatermark(img, true);
     img.src = watermarked.toDataURL('image/jpeg', 0.92);
   }
-}
 
-// Auto-apply watermark toast notification on batch completion (free plan)
-const _origProcessNext = window._origProcessNextRef;
-if (typeof startBatchProcessing === 'function') {
-  const _originalStart = startBatchProcessing;
-  // Wrap to show watermark notice on free plan
-  window.startBatchProcessingWithWatermark = function() {
-    _originalStart();
-    const currentPlan = localStorage.getItem('propulsia_plan') || 'free';
-    if (currentPlan === 'free') {
-      setTimeout(() => {
-        showToast('⚡', 'Plan Gratuit : logo PropulsIA ajouté en filigrane sur vos exports.');
-      }, 1200);
-    }
-  };
+  if (img.complete && img.naturalWidth > 0) {
+    doWatermark();
+  } else {
+    img.addEventListener('load', doWatermark, { once: true });
+  }
 }

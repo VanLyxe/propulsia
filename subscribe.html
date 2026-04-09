@@ -76,14 +76,14 @@
           <div class="pricing-price" id="priceDiscover">Gratuit</div>
           <div class="pricing-desc">Par tâche — Idéal pour tester</div>
           <ul class="pricing-features">
-            <li><span class="check">✓</span> 3 générations d'images / mois</li>
+            <li><span class="check">✓</span> 5 générations d'images / mois</li>
+            <li><span class="check">✓</span> 1 génération de vidéo / mois</li>
             <li><span class="check">✓</span> Comparateur Avant / Après</li>
             <li><span class="check">✓</span> Format 2K</li>
             <li><span class="check">✓</span> 1 secteur d'activité</li>
             <li><span class="check">✓</span> Sauvegarde 7 jours</li>
             <li style="color:var(--primary); font-size:0.85rem;"><span class="check">⚡</span> Logo PropulsIA en
               filigrane</li>
-            <li class="disabled"><span class="check">✗</span> Génération de vidéos</li>
             <li class="disabled"><span class="check">✗</span> Campagnes email</li>
             <li class="disabled"><span class="check">✗</span> Batch processing</li>
             <li class="disabled"><span class="check">✗</span> Support prioritaire</li>
@@ -103,10 +103,11 @@
             <li><span class="check">✓</span> Images illimitées</li>
             <li><span class="check">✓</span> Formats 2K & 4K</li>
             <li><span class="check">✓</span> Tous les 5 secteurs</li>
-            <li><span class="check">✓</span> 10 vidéos / mois</li>
+            <li><span class="check">✓</span> 15 vidéos / mois</li>
             <li><span class="check">✓</span> 100 emails / mois</li>
             <li><span class="check">✓</span> Batch processing</li>
             <li><span class="check">✓</span> Sauvegarde illimitée</li>
+            <li><span class="check">✓</span> Sans filigrane</li>
             <li><span class="check">✓</span> Support prioritaire</li>
             <li><span class="check">✓</span> Dashboard production</li>
           </ul>
@@ -248,8 +249,11 @@
     <span id="toastMessage"></span>
   </div>
 
-  <script src="js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/quota.js"></script>
+  <script src="js/main.js"></script>
 </body>
 
 </html>

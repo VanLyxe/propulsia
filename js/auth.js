@@ -250,20 +250,32 @@ function selectPlan(plan) {
   const icon = document.getElementById('subModalIcon');
   const title = document.getElementById('subModalTitle');
   const desc = document.getElementById('subModalDesc');
+  const cardGroup = document.getElementById('subCard')?.closest('.form-group');
+  const expiryRow = cardGroup?.parentElement?.querySelector('.form-row');
+
+  // Stocker le plan sélectionné pour processSubscription
+  modal.dataset.selectedPlan = plan;
 
   switch (plan) {
     case 'discover':
       if (icon) icon.textContent = '🆓';
       if (title) title.textContent = 'Plan Découverte';
       if (desc) desc.textContent = 'Créez votre compte gratuit pour commencer à utiliser nos outils.';
-      // For free plan, hide card fields
-      const cardField = document.getElementById('subCard');
-      if (cardField) cardField.parentElement.style.display = 'none';
+      // Cacher les champs de paiement pour le plan gratuit
+      if (cardGroup) cardGroup.style.display = 'none';
+      if (expiryRow) expiryRow.style.display = 'none';
+      const submitBtn = modal.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.textContent = '✅ Activer le plan gratuit';
       break;
     case 'pro':
       if (icon) icon.textContent = '⭐';
-      if (title) title.textContent = 'Abonnement Professionnel';
+      if (title) title.textContent = 'Abonnement Professionnel — 29 900 XPF/mois';
       if (desc) desc.textContent = 'Débloquez tous les outils de production IA.';
+      // Afficher les champs de paiement
+      if (cardGroup) cardGroup.style.display = 'block';
+      if (expiryRow) expiryRow.style.display = 'flex';
+      const submitBtnPro = modal.querySelector('button[type="submit"]');
+      if (submitBtnPro) submitBtnPro.textContent = '💳 Confirmer l\'abonnement';
       break;
   }
 
@@ -273,33 +285,49 @@ function selectPlan(plan) {
 async function processSubscription(e) {
   e.preventDefault();
   const email = document.getElementById('subEmail')?.value;
-
   if (!email) return;
+
+  const modal = document.getElementById('subModal');
+  const selectedPlan = modal?.dataset.selectedPlan || 'discover';
+
+  // Vérifier les champs de paiement pour le plan Pro
+  if (selectedPlan === 'pro') {
+    const card = document.getElementById('subCard')?.value?.trim();
+    if (!card || card.length < 16) {
+      showToast('⚠️', 'Veuillez entrer un numéro de carte valide.');
+      return;
+    }
+  }
 
   const user = await checkAuth();
   if (!user) {
     showToast('⚠️', 'Veuillez vous connecter ou vous inscrire avant de vous abonner.');
-    // Let's redirect to login and pass intent if necessary, or just warn
     return;
   }
 
+  const planConfig = {
+    discover: { role: 'prospect', label: 'Découverte', redirect: 'demo.html' },
+    pro: { role: 'subscriber', label: 'Professionnel', redirect: 'production.html' }
+  };
+
+  const config = planConfig[selectedPlan] || planConfig.discover;
+
   try {
-    // Save subscription logic securely in Supabase metadata
-    const { data, error } = await window.supabaseClient.auth.updateUser({
+    const { error } = await window.supabaseClient.auth.updateUser({
       data: {
-        role: 'subscriber',
-        plan: 'pro',
+        role: config.role,
+        plan: selectedPlan,
         subscribeTime: new Date().toISOString()
       }
     });
 
     if (error) throw error;
 
-    document.getElementById('subModal').classList.remove('active');
-    showToast('🎉', 'Abonnement activé avec succès ! Bienvenue dans l\'espace Pro !');
+    modal.classList.remove('active');
+    showToast('🎉', `Plan ${config.label} activé avec succès !`);
 
     setTimeout(() => {
-      window.location.href = 'production.html';
+      window.location.href = config.redirect;
     }, 2000);
   } catch (error) {
     showToast('⚠️', 'Erreur lors de l\'activation: ' + error.message);

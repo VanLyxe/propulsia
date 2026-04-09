@@ -364,6 +364,18 @@ async function startAnalysis() {
     return;
   }
 
+  // Vérification du quota d'images
+  if (typeof QuotaService !== 'undefined') {
+    const quota = await QuotaService.canGenerateImage();
+    if (!quota.allowed) {
+      showToast('🚫', `Limite atteinte ! Vous avez utilisé vos ${quota.limit} générations d'images ce mois-ci. Passez au Pro pour un accès illimité.`);
+      return;
+    }
+    if (quota.remaining !== '∞') {
+      showToast('📊', `Génération ${quota.used + 1}/${quota.limit} ce mois-ci`);
+    }
+  }
+
   // Show step 4
   const step4 = document.getElementById('step4');
   step4.style.display = 'block';
@@ -504,7 +516,7 @@ async function pollKieApiTask(taskId) {
   }
 }
 
-function showResult(generatedImageUrl, durationInSeconds) {
+async function showResult(generatedImageUrl, durationInSeconds) {
   document.getElementById('scanningState').style.display = 'none';
   document.getElementById('resultState').style.display = 'block';
 
@@ -519,7 +531,82 @@ function showResult(generatedImageUrl, durationInSeconds) {
   }
 
   beforeImg.src = uploadedImageData;
-  afterImg.src = generatedImageUrl;
+
+  // --- Déterminer si le filigrane est nécessaire ---
+  let needsWatermark = false;
+  if (typeof QuotaService !== 'undefined') {
+    try {
+      await QuotaService.recordImageGeneration();
+      needsWatermark = await QuotaService.shouldApplyWatermark();
+    } catch (e) {
+      console.warn('Quota recording failed:', e.message);
+      needsWatermark = true; // Par défaut, appliquer le filigrane
+    }
+  }
+
+  // --- Toujours télécharger l'image en blob (évite CORS pour canvas et upload) ---
+  lastGeneratedPublicUrl = generatedImageUrl; // Sauvegarder l'URL publique pour la vidéo
+  let imageBlob = null;
+  let blobUrl = null;
+  try {
+    const response = await fetch(generatedImageUrl);
+    imageBlob = await response.blob();
+    blobUrl = URL.createObjectURL(imageBlob);
+  } catch (e) {
+    console.warn('Fetch image failed, fallback URL directe:', e.message);
+  }
+
+  if (needsWatermark && blobUrl) {
+    // Appliquer le filigrane via canvas
+    const tempImg = new Image();
+    tempImg.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const w = tempImg.naturalWidth;
+      const h = tempImg.naturalHeight;
+      canvas.width = w;
+      canvas.height = h;
+      ctx.drawImage(tempImg, 0, 0, w, h);
+
+      // Filigrane centré en diagonale
+      ctx.save();
+      ctx.translate(w / 2, h / 2);
+      ctx.rotate(-Math.PI / 6);
+      const fontSize = Math.max(40, Math.round(Math.min(w, h) * 0.12));
+      ctx.font = `bold ${fontSize}px 'Outfit', Arial, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.fillText('PropulsIA', 0, 0);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.lineWidth = 2;
+      ctx.strokeText('PropulsIA', 0, 0);
+      ctx.restore();
+
+      const smallFS = Math.max(12, Math.round(h * 0.02));
+      ctx.font = `bold ${smallFS}px 'Outfit', Arial, sans-serif`;
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'bottom';
+      ctx.fillStyle = 'rgba(170, 255, 0, 0.5)';
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 4;
+      ctx.fillText('⚡ PropulsIA — Plan Gratuit', w - 10, h - 10);
+      ctx.shadowBlur = 0;
+
+      afterImg.src = canvas.toDataURL('image/jpeg', 0.92);
+      URL.revokeObjectURL(blobUrl);
+    };
+    tempImg.src = blobUrl;
+    showToast('⚡', 'Plan Gratuit : filigrane PropulsIA appliqué. Passez au Pro pour le retirer.');
+  } else if (blobUrl) {
+    afterImg.src = blobUrl;
+  } else {
+    afterImg.src = generatedImageUrl;
+  }
 
   // Wait for the new AI image to load to set matching dimensions for the before image container
   afterImg.onload = () => {
@@ -542,20 +629,17 @@ function showResult(generatedImageUrl, durationInSeconds) {
   overlay.classList.add('active');
   setTimeout(() => overlay.classList.remove('active'), 2500);
 
-  // 🔥 Sauvegarde automatique vers Supabase en arrière-plan
-  const metadata = {
-    sector: selectedSector,
-    style: getStyleLabel(),
-    format: document.getElementById('outputFormat')?.value?.toUpperCase() || '2K',
-    duration: durationInSeconds
-  };
-
-  if (typeof StorageService !== 'undefined') {
-    StorageService.autoSave(generatedImageUrl, metadata)
+  // 🔥 Sauvegarde automatique vers Supabase — utilise le blob déjà téléchargé
+  if (typeof StorageService !== 'undefined' && imageBlob) {
+    const metadata = {
+      sector: selectedSector,
+      style: getStyleLabel(),
+      format: document.getElementById('outputFormat')?.value?.toUpperCase() || '2K',
+      duration: durationInSeconds
+    };
+    StorageService.autoSaveBlob(imageBlob, metadata)
       .then(result => {
-        if (result) {
-          console.log('✅ Image auto-sauvegardée dans Supabase:', result.url);
-        }
+        if (result) console.log('✅ Image sauvegardée dans Supabase:', result.url);
       })
       .catch(err => console.warn('Auto-save échoué:', err.message));
   }
@@ -722,12 +806,25 @@ function getStyleLabel() {
 // --- Video Demo Feature ---
 let videoImg1Url = "";
 let videoImg2Url = "";
+let lastGeneratedPublicUrl = ""; // URL publique KIE originale (pas le blob)
 
 async function generateVideoDemo() {
   const afterImg = document.getElementById('afterImage');
   if (!afterImg || !afterImg.src || afterImg.src === window.location.href) {
     showToast('⚠️', 'Veuillez d\'abord générer une image avant de créer une vidéo.');
     return;
+  }
+
+  // Vérification du quota de vidéos
+  if (typeof QuotaService !== 'undefined') {
+    const quota = await QuotaService.canGenerateVideo();
+    if (!quota.allowed) {
+      showToast('🚫', `Limite atteinte ! Vous avez utilisé vos ${quota.limit} génération(s) de vidéo ce mois-ci. Passez au Pro pour plus.`);
+      return;
+    }
+    if (quota.remaining !== '∞') {
+      showToast('📊', `Vidéo ${quota.used + 1}/${quota.limit} ce mois-ci`);
+    }
   }
 
   // Unlock & Show Step 5
@@ -747,8 +844,9 @@ async function generateVideoDemo() {
   percentText.textContent = '10%';
 
   try {
-    videoImg1Url = afterImg.src;
-    document.getElementById('videoImg1').src = videoImg1Url;
+    // Utiliser l'URL publique KIE originale (pas le blob)
+    videoImg1Url = lastGeneratedPublicUrl || afterImg.src;
+    document.getElementById('videoImg1').src = afterImg.src;
 
     // Animate progress slightly while we wait
     let progress = 10;
@@ -806,6 +904,11 @@ async function generateVideoDemo() {
       playVideoAnimation();
       videoBtn.textContent = '✅ Vidéo générée';
     }, 1000);
+
+    // Enregistrer la génération vidéo dans le quota
+    if (typeof QuotaService !== 'undefined') {
+      await QuotaService.recordVideoGeneration();
+    }
 
   } catch (error) {
     console.error("Video Gen Error:", error);
