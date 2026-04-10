@@ -2,9 +2,8 @@
 // PROPULSIA - Supabase Configuration
 // ===========================
 
-const SUPABASE_URL = 'https://xskiuisvbfzsyjheogup.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhza2l1aXN2YmZ6c3lqaGVvZ3VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MzMxMDgsImV4cCI6MjA5MDEwOTEwOH0.vJfAGmHzU3cPYmd-0mWkKj0dX4hgvzw9GpiKSCiscsE';
-
+const SUPABASE_URL = window.ENV?.SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY || '';
 // Initialiser Supabase - stocke le client dans window.supabaseClient
 // IMPORTANT: ne PAS écraser window.supabase qui est la lib CDN
 function initSupabase() {

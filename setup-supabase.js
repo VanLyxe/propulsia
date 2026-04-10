@@ -6,7 +6,7 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const SUPABASE_PASSWORD = process.env.SUPABASE_PASSWORD;
 
-// Extract project ref from URL (e.g. https://xskiuisvbfzsyjheogup.supabase.co -> xskiuisvbfzsyjheogup)
+// Extract project ref from URL (e.g. https://[project_ref].supabase.co -> project_ref)
 const match = SUPABASE_URL.match(/https:\/\/([a-zA-Z0-9]+)\.supabase\.co/);
 const PROJECT_REF = match ? match[1] : null;
 
