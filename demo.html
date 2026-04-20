@@ -102,6 +102,16 @@
           <p>ou cliquez pour parcourir • JPG, PNG, WebP — max 10 Mo</p>
           <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
         </div>
+
+        <!-- NEW: Upload Loading -->
+        <div id="uploadLoading" style="display:none; text-align:center; padding: 48px;" class="glass-card">
+          <div style="font-size:2rem; margin-bottom:16px;">🤖</div>
+          <h3 style="margin-bottom:12px;">Vérification de l'image par l'IA...</h3>
+          <div class="progress-bar" style="max-width:300px; margin:0 auto;">
+             <div id="uploadProgressBar" class="progress-bar-fill" style="width:10%; background: var(--gradient-primary); transition: width 0.3s ease;"></div>
+          </div>
+          <p id="uploadProgressPercent" style="margin-top:8px; font-size:0.9rem; color:var(--text-secondary);">10%</p>
+        </div>
         <!-- Preview -->
         <div id="uploadPreview" style="display:none; margin-top:24px; text-align:center;">
           <div class="glass-card" style="padding:16px; display:inline-block; position:relative;">
@@ -254,16 +264,13 @@
         </div>
 
         <div id="videoResultState" style="display:none;">
-          <div class="glass-card" style="max-width:800px; margin:0 auto; padding:0; overflow:hidden;">
-            <div class="video-mock-player">
-              <div class="video-container" id="videoContainer">
-                <img id="videoImg1" src="" class="video-frame frame-1" alt="Frame 1">
-                <img id="videoImg2" src="" class="video-frame frame-2" alt="Frame 2">
-              </div>
-              <div class="video-controls">
-                <button class="btn btn-sm btn-primary" onclick="replayVideo()">▶️ Rejouer l'animation</button>
-              </div>
-            </div>
+          <div class="glass-card" style="max-width:800px; margin:0 auto; padding:0; overflow:hidden; position:relative; background:#000;">
+            <video id="videoResultPlayer" controls autoplay loop playsinline crossorigin="anonymous" preload="auto" style="width:100%; display:block;">
+              Votre navigateur ne supporte pas la lecture vidéo HTML5.
+            </video>
+          </div>
+          <div style="text-align:center; margin-top:24px; display:flex; justify-content:center; gap:12px;">
+            <button class="btn btn-primary" onclick="downloadVideoResult()">⬇️ Télécharger la vidéo</button>
           </div>
         </div>
       </div>
@@ -288,8 +295,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-  <script src="js/supabase-config.js"></script>
   <script src="js/env.js"></script>
+  <script src="js/supabase-config.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/main.js"></script>
   <script src="js/quota.js"></script>

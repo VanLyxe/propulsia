@@ -73,48 +73,69 @@ function processFile(file) {
   const reader = new FileReader();
   reader.onload = async (e) => {
     const dataUrl = e.target.result;
+
+    // Show loading bar instead of upload zone
+    document.getElementById('uploadZone').style.display = 'none';
+    document.getElementById('uploadLoading').style.display = 'block';
+    
+    // Simulate progress
+    const progressBar = document.getElementById('uploadProgressBar');
+    const percentText = document.getElementById('uploadProgressPercent');
+    let uploadProg = 10;
+    progressBar.style.width = '10%';
+    percentText.textContent = '10%';
+    
+    const loadInt = setInterval(() => {
+      if (uploadProg < 92) {
+        uploadProg += Math.floor(Math.random() * 8) + 2;
+        progressBar.style.width = uploadProg + '%';
+        percentText.textContent = uploadProg + '%';
+      }
+    }, 400);
     
     // Validation avec Gemini
     const result = await validateImageWithGemini(dataUrl, selectedSector);
     
-    if (!result.valid) {
-      removeImage();
-      if (result.error) {
-        // Erreur technique
-        showImageError(
-          'Problème technique',
-          result.error,
-          null
-        );
-      } else {
-        // Image non conforme au secteur
-        const sectorLabel = getSectorLabel(selectedSector);
-        const expectedImages = getSectorExpectedImages(selectedSector);
-        showImageError(
-          `Image non conforme au secteur ${sectorLabel}`,
-          result.reason || `L'image que vous avez importée ne correspond pas au secteur « ${sectorLabel} ».`,
-          expectedImages
-        );
-      }
-      return;
-    }
-
-    // Fermer le modal d'erreur s'il est ouvert
-    hideImageError();
-
-    uploadedImageData = dataUrl;
-    const previewImg = document.getElementById('previewImg');
-    previewImg.src = uploadedImageData;
-
-    document.getElementById('uploadPreview').style.display = 'block';
-    document.getElementById('uploadZone').style.display = 'none';
-
-    // Unlock step 3
-    const step3 = document.getElementById('step3');
-    step3.style.opacity = '1';
-    step3.style.pointerEvents = 'auto';
+    clearInterval(loadInt);
+    progressBar.style.width = '100%';
+    percentText.textContent = '100%';
     
-    showToast('✅', 'Image validée avec succès par l\'IA ! ✨');
+    // Slight delay so the user sees 100%
+    setTimeout(() => {
+      document.getElementById('uploadLoading').style.display = 'none';
+
+      if (!result.valid) {
+        removeImage();
+        if (result.error) {
+          showImageError('Problème technique', result.error, null);
+        } else {
+          const sectorLabel = getSectorLabel(selectedSector);
+          const expectedImages = getSectorExpectedImages(selectedSector);
+          showImageError(
+            `Image non conforme au secteur ${sectorLabel}`,
+            result.reason || `L'image que vous avez importée ne correspond pas au secteur « ${sectorLabel} ».`,
+            expectedImages
+          );
+        }
+        return;
+      }
+
+      // Fermer le modal d'erreur s'il est ouvert
+      hideImageError();
+
+      uploadedImageData = dataUrl;
+      const previewImg = document.getElementById('previewImg');
+      previewImg.src = uploadedImageData;
+
+      document.getElementById('uploadPreview').style.display = 'block';
+
+      // Unlock step 3
+      const step3 = document.getElementById('step3');
+      step3.style.opacity = '1';
+      step3.style.pointerEvents = 'auto';
+      
+      showToast('✅', 'Image validée avec succès par l\'IA ! ✨');
+    }, 400);
   };
   reader.readAsDataURL(file);
 }
@@ -342,6 +363,7 @@ function removeImage() {
   uploadedImageData = null;
   document.getElementById('previewImg').src = '';
   document.getElementById('uploadPreview').style.display = 'none';
+  document.getElementById('uploadLoading').style.display = 'none';
   document.getElementById('uploadZone').style.display = 'block';
   document.getElementById('fileInput').value = '';
 
@@ -479,39 +501,87 @@ async function runKieApiEnhancement(publicImageUrl, sector) {
   return pollKieApiTask(taskId);
 }
 
-async function pollKieApiTask(taskId) {
-  const progressBar = document.getElementById('scanProgress');
-  const percentText = document.getElementById('scanPercent');
-  document.getElementById('scanDesc').textContent = 'Génération Nano Banana en cours (jusqu\'à 30s)...';
-  let progress = 30;
+async function pollKieApiTask(taskId, options = {}) {
+  const {
+    progressBar = document.getElementById('scanProgress'),
+    percentText = document.getElementById('scanPercent'),
+    descElement = document.getElementById('scanDesc'),
+    initialProgress = 30,
+    descText = 'Génération en cours (jusqu\'à 30s)...',
+    timeoutMs = 10 * 60 * 1000 // 10 minutes par défaut
+  } = options;
+
+  if (descElement && descText) {
+    descElement.textContent = descText;
+  }
+  let progress = initialProgress;
+  const startTime = Date.now();
+  let errorCount = 0;
+  let delay = 3000; // Exponential backoff
 
   while (true) {
-    await new Promise(r => setTimeout(r, 3000)); // Poll every 3 seconds
-
-    if (progress < 90) {
-      progress += Math.floor(Math.random() * 8) + 2;
-      progressBar.style.width = `${progress}%`;
-      percentText.textContent = `${progress}%`;
+    if (Date.now() - startTime > timeoutMs) {
+      throw new Error("L'API est actuellement surchargée (délai dépassé). Veuillez réessayer plus tard.");
     }
 
-    const response = await fetch(`https://api.kie.ai/api/v1/jobs/recordInfo?taskId=${taskId}`, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${KIE_API_KEY}`
-      }
-    });
+    await new Promise(r => setTimeout(r, delay));
+    delay = Math.min(delay * 1.3, 8000); // augmente le délai jusqu'à 8s max
 
-    if (!response.ok) continue;
+    if (progress < 90) {
+      // Ralentir visuellement la progression pour correspondre aux longs délais
+      progress += Math.floor(Math.random() * 3) + 1;
+      if (progressBar) progressBar.style.width = `${progress}%`;
+      if (percentText) percentText.textContent = `${progress}%`;
+    }
 
-    const data = await response.json();
-    if (data.code === 200 && data.data) {
-      const state = data.data.state;
-      if (state === "success") {
-        const resultJson = JSON.parse(data.data.resultJson);
-        return resultJson.resultUrls[0];
-      } else if (state === "fail") {
-        throw new Error(`La tâche a échoué: ${data.data.failMsg || 'Erreur GPU ou Serveur'}`);
+    try {
+      const response = await fetch(`https://api.kie.ai/api/v1/jobs/recordInfo?taskId=${taskId}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${KIE_API_KEY}`
+        }
+      });
+
+      if (!response.ok) {
+        errorCount++;
+        if (errorCount > 5) throw new Error("Trop d'erreurs réseau avec l'API KIE.");
+        continue;
       }
+      
+      errorCount = 0; // reset on success
+
+      const data = await response.json();
+      if (data.code === 200 && data.data) {
+        const state = data.data.state;
+        const elapsed = Math.round((Date.now() - startTime) / 1000);
+        console.log(`⏳ Poll [${elapsed}s]: state="${state}", taskId="${taskId}"`);
+        
+        // Mettre à jour le texte de description avec l'état
+        if (descElement) {
+          const stateLabels = {
+            'waiting': 'En file d\'attente...',
+            'queuing': 'Dans la file de traitement...',
+            'generating': 'Génération en cours...'
+          };
+          if (stateLabels[state]) descElement.textContent = stateLabels[state];
+        }
+
+        if (state === "success") {
+          const resultJson = JSON.parse(data.data.resultJson);
+          console.log("✅ Résultat:", resultJson);
+          return resultJson.resultUrls[0];
+        } else if (state === "fail") {
+          console.error("❌ Échec:", data.data);
+          throw new Error(`La tâche a échoué: ${data.data.failMsg || 'Erreur GPU ou Serveur'}`);
+        }
+      }
+    } catch (err) {
+      if (err.message.includes("surchargée") || err.message.includes("failMsg") || err.message.includes("réseau")) {
+        throw err;
+      }
+      // Other generic fetch errors (like CORS, network loss locally)
+      errorCount++;
+      if (errorCount > 5) throw new Error("Connexion perdue avec le serveur de génération.");
     }
   }
 }
@@ -808,6 +878,79 @@ let videoImg1Url = "";
 let videoImg2Url = "";
 let lastGeneratedPublicUrl = ""; // URL publique KIE originale (pas le blob)
 
+// Polling dédié pour Veo 3.1 — gère la structure resultJson de Veo
+async function pollVeoTask(taskId, progressBar, percentText, titleElement) {
+  const timeoutMs = 12 * 60 * 1000; // 12 minutes
+  const start = Date.now();
+  let delay = 5000; // Veo est lent, démarrer à 5s
+  let progress = 15;
+  let errorCount = 0;
+
+  while (Date.now() - start < timeoutMs) {
+    await new Promise(r => setTimeout(r, delay));
+    delay = Math.min(delay * 1.4, 15000); // backoff exponentiel, max 15s
+
+    if (progress < 90) {
+      progress += Math.floor(Math.random() * 4) + 1;
+      if (progressBar) progressBar.style.width = `${progress}%`;
+      if (percentText) percentText.textContent = `${progress}%`;
+    }
+
+    try {
+      const res = await fetch(`https://api.kie.ai/api/v1/jobs/recordInfo?taskId=${taskId}`, {
+        headers: { "Authorization": `Bearer ${KIE_API_KEY}` }
+      });
+
+      if (!res.ok) {
+        errorCount++;
+        if (errorCount > 5) throw new Error("Trop d'erreurs réseau lors du polling Veo.");
+        continue;
+      }
+
+      errorCount = 0;
+      const json = await res.json();
+      const d = json.data;
+      const elapsed = Math.round((Date.now() - start) / 1000);
+      console.log(`⏳ Veo Poll [${elapsed}s]: state="${d?.state}", taskId="${taskId}"`);
+
+      const stateLabels = {
+        waiting: 'En file d\'attente Veo 3.1...',
+        queuing: 'Dans la file de génération...',
+        generating: 'Génération de la vidéo en cours...'
+      };
+      if (titleElement && stateLabels[d?.state]) {
+        titleElement.textContent = stateLabels[d.state];
+      }
+
+      if (d?.state === 'success') {
+        // resultJson est une chaîne JSON : "{\"resultUrls\":[\"...\"]}"
+        const parsed = JSON.parse(d.resultJson);
+        const url = parsed.resultUrls?.[0];
+        if (!url) throw new Error('Veo a réussi mais aucune URL de vidéo retournée.');
+        console.log('✅ Veo vidéo prête:', url);
+        return url;
+      }
+
+      if (d?.state === 'fail') {
+        throw new Error(`Veo a échoué : ${d.failMsg || d.failCode || 'Erreur inconnue'}`);
+      }
+
+    } catch (err) {
+      // Ne pas absorber les erreurs métier (fail, no URL)
+      if (
+        err.message.includes('Veo a échoué') ||
+        err.message.includes('aucune URL') ||
+        err.message.includes('erreurs réseau')
+      ) throw err;
+      errorCount++;
+      if (errorCount > 5) throw new Error('Connexion perdue avec le serveur Veo.');
+      console.warn('Veo poll fetch error (retry):', err.message);
+    }
+  }
+
+  throw new Error('La génération Veo 3.1 a dépassé le temps limite (12 min). Réessayez.');
+}
+
 async function generateVideoDemo() {
   const afterImg = document.getElementById('afterImage');
   if (!afterImg || !afterImg.src || afterImg.src === window.location.href) {
@@ -844,40 +987,42 @@ async function generateVideoDemo() {
   percentText.textContent = '10%';
 
   try {
-    // Utiliser l'URL publique KIE originale (pas le blob)
+    // Utiliser l'URL publique KIE originale (pas le blob ni le data: URL)
     videoImg1Url = lastGeneratedPublicUrl || afterImg.src;
-    document.getElementById('videoImg1').src = afterImg.src;
+    console.log("🎬 Vidéo: URL image source:", videoImg1Url);
 
-    // Animate progress slightly while we wait
-    let progress = 10;
-    const interval = setInterval(() => {
-      if (progress < 90) {
-        progress += Math.floor(Math.random() * 5);
-        progressBar.style.width = progress + '%';
-        percentText.textContent = progress + '%';
-      }
-    }, 2000);
+    // Vérifier que l'URL est bien publique (pas un blob ni un data: URI)
+    if (videoImg1Url.startsWith('blob:')) {
+      throw new Error("L'image source est un blob local. Veuillez régénérer l'image avant de créer la vidéo.");
+    }
+    
+    // Si c'est un data: URL (watermark canvas), on doit le re-héberger
+    if (videoImg1Url.startsWith('data:')) {
+      console.log("🎬 Vidéo: Image source est un data: URL (watermark), re-hébergement...");
+      document.getElementById('videoScanTitle').textContent = 'Hébergement de l\'image source...';
+      videoImg1Url = await uploadImageToTmpfiles(videoImg1Url);
+      console.log("🎬 Vidéo: Image re-hébergée:", videoImg1Url);
+    }
 
-    // Prompt for 2nd angle
     const style = getStyleLabel();
     const sectorLabel = getSectorLabel(selectedSector);
-    const prompt = `Same identical scene as reference, but from a DIFFERENT camera angle. Wide shot, cinematic camera movement, visually stunning, 8k resolution, for a ${sectorLabel} business, in a ${style} style. Photorealistic.`;
 
-    // We assume publicImageUrl is still valid or we pass the base64 again. But since we have the tmpfiles URL if the user hasn't refreshed:
-    // We need to re-upload the afterImage just in case, but since afterImage is already a URL from KIE, we can pass it directly!
-    // KIE returns a public URL in resultUrls. Let's pass it directly.
+    // Construire un prompt riche en TEXT_2_VIDEO (plus fiable que REFERENCE_2_VIDEO)
+    const prompt = `Cinematic slow motion promotional video for a ${sectorLabel} business. Smooth camera movement, professional studio lighting, highly detailed, ${style} style, photorealistic 4K quality. Elegant and visually stunning.`;
+
+    document.getElementById('videoScanTitle').textContent = 'Envoi de la requête à Veo 3.1...';
+
+    // TEXT_2_VIDEO uniquement — fiable et sans dépendance à une URL image publique
     const payload = {
-      model: "nano-banana-2",
-      input: {
-        prompt: prompt,
-        image_input: [videoImg1Url],
-        aspect_ratio: "16:9", // Force 16:9 for video
-        resolution: "2K",
-        output_format: "jpg"
-      }
+      prompt: prompt,
+      model: "veo3_fast",
+      generationType: "TEXT_2_VIDEO",
+      aspect_ratio: "16:9"
     };
 
-    const response = await fetch("https://api.kie.ai/api/v1/jobs/createTask", {
+    console.log("🎬 Veo payload:", JSON.stringify(payload, null, 2));
+
+    const response = await fetch("https://api.kie.ai/api/v1/veo/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -886,49 +1031,182 @@ async function generateVideoDemo() {
       body: JSON.stringify(payload)
     });
 
-    if (!response.ok) throw new Error("Erreur de l'API KIE");
-    const data = await response.json();
-    if (data.code !== 200) throw new Error("Échec createTask");
+    const responseText = await response.text();
+    console.log("🎬 Veo réponse brute:", responseText);
 
-    videoImg2Url = await pollKieApiTask(data.data.taskId);
-    clearInterval(interval);
+    if (!response.ok) throw new Error(`API Veo ${response.status}: ${responseText.substring(0, 200)}`);
+
+    const data = JSON.parse(responseText);
+    if (data.code !== 200) throw new Error(`Veo API: ${data.msg || JSON.stringify(data)}`);
+
+    const taskId = data.data?.taskId;
+    if (!taskId) throw new Error('Pas de taskId retourné par l\'API Veo.');
+    console.log("🎬 Veo taskId:", taskId);
+
+    // Polling dédié Veo
+    videoImg2Url = await pollVeoTask(
+      taskId,
+      progressBar,
+      percentText,
+      document.getElementById('videoScanTitle')
+    );
 
     progressBar.style.width = '100%';
     percentText.textContent = '100%';
+    document.getElementById('videoScanTitle').textContent = 'Chargement de la vidéo...';
+    console.log("🎬 Vidéo générée URL:", videoImg2Url);
 
-    document.getElementById('videoImg2').src = videoImg2Url;
+    // --- Affichage du player ---
+    const player = document.getElementById('videoResultPlayer');
+    player.removeAttribute('src');
+    player.innerHTML = '';
+    player.style.display = 'block';
+    player.load();
 
-    setTimeout(() => {
-      document.getElementById('videoScanningState').style.display = 'none';
-      document.getElementById('videoResultState').style.display = 'block';
-      playVideoAnimation();
-      videoBtn.textContent = '✅ Vidéo générée';
-    }, 1000);
+    const oldFallback = document.getElementById('videoDirectLink');
+    if (oldFallback) oldFallback.remove();
+    const oldIframe = document.getElementById('videoIframeFallback');
+    if (oldIframe) oldIframe.remove();
 
-    // Enregistrer la génération vidéo dans le quota
+    // Méthode 1 : Blob (contourne CORS pour la lecture)
+    let videoReady = false;
+    try {
+      const videoResponse = await fetch(videoImg2Url);
+      if (videoResponse.ok) {
+        const videoBlob = await videoResponse.blob();
+        const videoBlobUrl = URL.createObjectURL(videoBlob);
+        console.log("🎬 Blob vidéo créé, taille:", videoBlob.size, "type:", videoBlob.type);
+        const source = document.createElement('source');
+        source.src = videoBlobUrl;
+        source.type = videoBlob.type || 'video/mp4';
+        player.appendChild(source);
+        player.dataset.blobUrl = videoBlobUrl;
+        player.dataset.originalUrl = videoImg2Url;
+        player.load();
+        videoReady = true;
+      }
+    } catch (blobErr) {
+      console.warn("⚠️ Blob fetch échoué (CORS):", blobErr.message);
+    }
+
+    // Méthode 2 : URL directe fallback
+    if (!videoReady) {
+      const source = document.createElement('source');
+      source.src = videoImg2Url;
+      source.type = 'video/mp4';
+      player.appendChild(source);
+      player.dataset.originalUrl = videoImg2Url;
+      player.load();
+    }
+
+    // Attendre que la vidéo soit prête (max 10s)
+    await new Promise((resolve) => {
+      const t = setTimeout(resolve, 10000);
+      player.addEventListener('canplay', () => { clearTimeout(t); resolve(); }, { once: true });
+      player.addEventListener('loadeddata', () => { clearTimeout(t); resolve(); }, { once: true });
+      player.addEventListener('error', () => { clearTimeout(t); resolve(); }, { once: true });
+    });
+
+    document.getElementById('videoScanningState').style.display = 'none';
+    document.getElementById('videoResultState').style.display = 'block';
+
+    try { await player.play(); } catch (e) { console.warn("Autoplay bloqué:", e.message); }
+
+    // Fallback si le player ne fonctionne pas
+    if (player.readyState < 2 || player.error) {
+      player.style.display = 'none';
+      const container = player.parentElement;
+      const iframeEl = document.createElement('div');
+      iframeEl.id = 'videoIframeFallback';
+      iframeEl.style.cssText = 'width:100%; aspect-ratio:16/9;';
+      iframeEl.innerHTML = `<iframe src="${videoImg2Url}" style="width:100%;height:100%;border:none;" allowfullscreen></iframe>`;
+      container.appendChild(iframeEl);
+
+      const linkDiv = document.createElement('div');
+      linkDiv.id = 'videoDirectLink';
+      linkDiv.style.cssText = 'text-align:center; margin-top:16px;';
+      linkDiv.innerHTML = `
+        <p style="color:var(--text-secondary); margin-bottom:12px;">Si la vidéo ne s'affiche pas, ouvrez-la directement :</p>
+        <a href="${videoImg2Url}" target="_blank" class="btn btn-secondary">🔗 Ouvrir dans un nouvel onglet</a>
+      `;
+      document.getElementById('videoResultState').appendChild(linkDiv);
+    }
+
+    player.onerror = () => {
+      player.style.display = 'none';
+      if (!document.getElementById('videoDirectLink')) {
+        const linkDiv = document.createElement('div');
+        linkDiv.id = 'videoDirectLink';
+        linkDiv.style.cssText = 'text-align:center; margin-top:16px;';
+        linkDiv.innerHTML = `<a href="${videoImg2Url}" target="_blank" class="btn btn-secondary">🔗 Ouvrir la vidéo dans un nouvel onglet</a>`;
+        document.getElementById('videoResultState').appendChild(linkDiv);
+      }
+    };
+
+    videoBtn.textContent = '✅ Vidéo générée';
+
     if (typeof QuotaService !== 'undefined') {
       await QuotaService.recordVideoGeneration();
     }
 
   } catch (error) {
     console.error("Video Gen Error:", error);
-    showToast('❌', 'Erreur lors de la création de la vidéo');
+    document.getElementById('videoScanningState').style.display = 'none';
+    showToast('❌', 'Vidéo: ' + (error.message || 'Erreur inconnue').substring(0, 120));
     videoBtn.disabled = false;
     videoBtn.textContent = '🎥 Réessayer';
   }
 }
 
-function playVideoAnimation() {
-  const container = document.getElementById('videoContainer');
+// Téléchargement sécurisé via Blob pour contourner CORS
+async function downloadVideoResult() {
+  const player = document.getElementById('videoResultPlayer');
+  // Avec l'approche <source>, player.src peut être vide — utiliser dataset ou source
+  const originalUrl = player?.dataset?.originalUrl;
+  const sourceEl = player?.querySelector('source');
+  const videoSrc = originalUrl || player?.src || sourceEl?.src;
+  
+  if (!player || !videoSrc) {
+    showToast('⚠️', 'Aucune vidéo à télécharger.');
+    return;
+  }
 
-  // Remove class to reset animation
-  container.classList.remove('video-animate');
-  // Trigger reflow
-  void container.offsetWidth;
-  // Add class to restart
-  container.classList.add('video-animate');
-}
-
-function replayVideo() {
-  playVideoAnimation();
+  try {
+    showToast('⏳', 'Préparation du format MP4...');
+    
+    // Utiliser le blob URL déjà stocké, ou re-télécharger si nécessaire
+    let blobUrl = player.dataset.blobUrl;
+    
+    if (!blobUrl) {
+      try {
+        const response = await fetch(originalUrl || videoSrc);
+        const blob = await response.blob();
+        blobUrl = URL.createObjectURL(blob);
+      } catch (fetchErr) {
+        // CORS bloqué - ouvrir directement dans un nouvel onglet
+        console.warn("Fetch vidéo échoué, ouverture directe:", fetchErr.message);
+        window.open(originalUrl || videoSrc, '_blank');
+        showToast('🔗', 'La vidéo s\'ouvre dans un nouvel onglet — faites clic-droit > Enregistrer');
+        return;
+      }
+    }
+    
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = `propulsia-veo3-video-${Date.now()}.mp4`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    showToast('⬇️', 'Téléchargement de la vidéo réussi !');
+  } catch (err) {
+    console.error("Erreur téléchargement vidéo:", err);
+    // Dernier fallback : ouvrir l'URL dans un nouvel onglet
+    if (originalUrl) {
+      window.open(originalUrl, '_blank');
+      showToast('🔗', 'La vidéo s\'ouvre dans un nouvel onglet');
+    } else {
+      showToast('⚠️', 'Le téléchargement a échoué. Essayez clic-droit sur la vidéo.');
+    }
+  }
 }

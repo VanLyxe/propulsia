@@ -1999,3 +1999,103 @@ input[type="checkbox"].propulsia-check {
   box-shadow: 0 0 0 3px rgba(170, 255, 0, 0.1) !important;
 }
 
+
+/* --- Image Error Modal --- */
+.image-error-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.image-error-modal.active {
+  display: flex;
+}
+
+.image-error-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+}
+
+.image-error-content {
+  position: relative;
+  z-index: 1;
+  max-width: 520px;
+  width: 100%;
+  padding: 40px 36px;
+  border-color: rgba(239, 68, 68, 0.35);
+  animation: scaleIn 0.25s ease-out;
+  text-align: center;
+}
+
+.image-error-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.image-error-close:hover {
+  background: rgba(239,68,68,0.2);
+  border-color: rgba(239,68,68,0.4);
+  color: #f87171;
+}
+
+.image-error-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.image-error-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f87171;
+  margin-bottom: 12px;
+}
+
+.image-error-reason {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.image-error-expected {
+  background: rgba(170,255,0,0.05);
+  border: 1px solid rgba(170,255,0,0.15);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  text-align: left;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.image-error-expected strong {
+  display: block;
+  color: var(--accent-light);
+  margin-bottom: 6px;
+}
+
+.image-error-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
